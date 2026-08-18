@@ -46,14 +46,23 @@ const APP_STATE = {
   candlestickChartInstance: null
 };
 
-// Router
-function navigateTo(viewId, triggerSound = true) {
+// Router - strictly switches active view
+function navigateTo(viewId, triggerSound = true, ev = null) {
+  if (ev && ev.preventDefault) {
+    ev.preventDefault();
+  }
+
+  if (!viewId) viewId = 'dashboard';
+  viewId = viewId.replace(/^#/, '');
+
   if (triggerSound && window.terminalAudio) {
     window.terminalAudio.playClick();
   }
 
   APP_STATE.activeView = viewId;
-  window.location.hash = viewId;
+  if (window.location.hash !== `#${viewId}`) {
+    window.location.hash = viewId;
+  }
 
   // Update nav item highlighting
   document.querySelectorAll('.nav-item').forEach(el => {
@@ -64,12 +73,14 @@ function navigateTo(viewId, triggerSound = true) {
     }
   });
 
-  // Switch SPA views
+  // Switch SPA views with absolute isolation
   document.querySelectorAll('.spa-view').forEach(view => {
     if (view.id === `view-${viewId}`) {
       view.classList.add('active-view');
+      view.style.display = 'flex';
     } else {
       view.classList.remove('active-view');
+      view.style.display = 'none';
     }
   });
 
@@ -82,9 +93,11 @@ function navigateTo(viewId, triggerSound = true) {
         APP_STATE.candlestickChartInstance.resize();
         APP_STATE.candlestickChartInstance.render();
       }
-    }, 50);
+    }, 60);
   }
 
+  const viewport = document.getElementById('app-viewport');
+  if (viewport) viewport.scrollTop = 0;
   window.scrollTo(0, 0);
 }
 
@@ -138,7 +151,7 @@ function updateHeaderStats() {
   if (elPnL) {
     const isPos = APP_STATE.portfolio.dayPnL >= 0;
     elPnL.textContent = `${isPos ? '+' : ''}${APP_STATE.portfolio.dayPnLPercent}%`;
-    elPnL.className = isPos ? 'text-profit-green bg-[#006727]/30 px-1.5 py-0.5 rounded text-[12px] font-mono' : 'text-loss-red bg-[#93000a]/30 px-1.5 py-0.5 rounded text-[12px] font-mono';
+    elPnL.className = isPos ? 'text-tertiary bg-[#006727]/30 px-1.5 py-0.5 rounded text-[11px] font-bold font-mono' : 'text-error bg-[#93000a]/30 px-1.5 py-0.5 rounded text-[11px] font-bold font-mono';
   }
 }
 
@@ -184,11 +197,11 @@ function showToast(message, type = 'success') {
   const icon = type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'check_circle';
   const iconCol = type === 'error' ? 'text-[#ff3d57]' : type === 'warning' ? 'text-[#ff9800]' : 'text-[#00e5ff]';
 
-  toast.className = `flex items-center gap-3 bg-[#0e1013] border-l-4 ${borderCol} border border-[#21262d] px-4 py-3 rounded shadow-2xl text-[13px] font-mono animate-fadeIn transition-all duration-300 pointer-events-auto`;
+  toast.className = `flex items-center gap-3 bg-[#0e1013] border-l-4 ${borderCol} border border-[#21262d] px-4 py-3 rounded shadow-2xl text-[13px] font-mono pointer-events-auto transition-all duration-300`;
   toast.innerHTML = `
     <span class="material-symbols-outlined ${iconCol} text-[18px]">${icon}</span>
     <span class="text-on-surface flex-1">${message}</span>
-    <button class="text-text-secondary hover:text-white" onclick="this.parentElement.remove()"><span class="material-symbols-outlined text-[16px]">close</span></button>
+    <button class="text-on-surface-variant hover:text-white" onclick="this.parentElement.remove()"><span class="material-symbols-outlined text-[16px]">close</span></button>
   `;
 
   container.appendChild(toast);
@@ -267,17 +280,17 @@ function renderOrdersTable() {
   if (!tbody) return;
 
   if (APP_STATE.openOrders.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-text-secondary font-mono text-[12px]">NO ACTIVE OPEN ORDERS IN QUEUE</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-on-surface-variant font-mono text-[12px]">NO ACTIVE OPEN ORDERS IN QUEUE</td></tr>`;
     return;
   }
 
   tbody.innerHTML = APP_STATE.openOrders.map(o => `
     <tr class="border-b border-[#21262d] hover:bg-[#15181e] font-mono text-[12px]">
       <td class="py-2.5 px-4 text-[#00e5ff] font-bold">${o.id}</td>
-      <td class="py-2.5 px-4 text-text-secondary">${o.time}</td>
+      <td class="py-2.5 px-4 text-on-surface-variant">${o.time}</td>
       <td class="py-2.5 px-4 font-bold text-white">${o.symbol}</td>
       <td class="py-2.5 px-4"><span class="px-1.5 py-0.5 text-[10px] font-bold rounded ${o.side === 'BUY' ? 'bg-[#00c853]/20 text-[#00e676]' : 'bg-[#ff1744]/20 text-[#ff3d57]'}">${o.side}</span></td>
-      <td class="py-2.5 px-4 text-text-secondary">${o.type}</td>
+      <td class="py-2.5 px-4 text-on-surface-variant">${o.type}</td>
       <td class="py-2.5 px-4 text-right">₹${o.price.toLocaleString('en-IN')}</td>
       <td class="py-2.5 px-4 text-right">${o.qty}</td>
       <td class="py-2.5 px-4 text-center">
@@ -295,13 +308,13 @@ function renderTransactionsTable() {
   tbody.innerHTML = APP_STATE.transactions.map(t => `
     <tr class="border-b border-[#21262d] hover:bg-[#15181e] font-mono text-[12px]">
       <td class="py-2.5 px-4 text-[#00e5ff] font-bold">${t.id}</td>
-      <td class="py-2.5 px-4 text-text-secondary">${t.time}</td>
+      <td class="py-2.5 px-4 text-on-surface-variant">${t.time}</td>
       <td class="py-2.5 px-4 font-bold text-white">${t.symbol}</td>
       <td class="py-2.5 px-4"><span class="px-1.5 py-0.5 text-[10px] font-bold rounded ${t.side === 'BUY' || t.side === 'DEPOSIT' ? 'bg-[#00c853]/20 text-[#00e676]' : 'bg-[#ff1744]/20 text-[#ff3d57]'}">${t.side}</span></td>
       <td class="py-2.5 px-4 text-right">₹${t.price.toLocaleString('en-IN')}</td>
       <td class="py-2.5 px-4 text-right">${t.qty}</td>
       <td class="py-2.5 px-4 text-right text-white font-bold">₹${t.amount.toLocaleString('en-IN')}</td>
-      <td class="py-2.5 px-4 text-right text-text-secondary">₹${t.fee.toFixed(2)}</td>
+      <td class="py-2.5 px-4 text-right text-on-surface-variant">₹${t.fee.toFixed(2)}</td>
       <td class="py-2.5 px-4 text-center"><span class="text-[#00e676] text-[11px] font-bold">● ${t.status}</span></td>
     </tr>
   `).join('');
@@ -385,7 +398,7 @@ function triggerBlackSwanShock(shockType) {
     APP_STATE.portfolio.dayPnLPercent = +12.4;
 
     if (banner && alertText) {
-      alertText.innerHTML = `<strong>MARKET SURGE:</strong> Break-through AI supercluster deployment triggers institutional short squeeze.`;
+      alertText.innerHTML = `<strong>MARKET SURGE:</strong> Breakthrough AI deployment triggers institutional short squeeze.`;
       banner.classList.remove('hidden');
     }
     showToast('🚀 Bullish Tech Short Squeeze in effect!', 'success');
@@ -445,20 +458,20 @@ function filterCommandResults(query) {
   const matched = pages.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.id.includes(q));
 
   if (matched.length === 0) {
-    list.innerHTML = `<div class="p-4 text-center text-text-secondary font-mono text-[13px]">No matching command or ticker found.</div>`;
+    list.innerHTML = `<div class="p-4 text-center text-on-surface-variant font-mono text-[13px]">No matching command or ticker found.</div>`;
     return;
   }
 
   list.innerHTML = matched.map(p => `
-    <div onclick="navigateTo('${p.id}'); closeCommandPalette();" class="flex items-center justify-between px-4 py-3 hover:bg-[#1b2028] cursor-pointer rounded transition-colors group">
+    <div onclick="navigateTo('${p.id}', true, event); closeCommandPalette();" class="flex items-center justify-between px-4 py-3 hover:bg-[#1b2028] cursor-pointer rounded transition-colors group">
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-[20px] text-text-secondary group-hover:text-[#00e5ff]">${p.icon}</span>
+        <span class="material-symbols-outlined text-[20px] text-on-surface-variant group-hover:text-[#00e5ff]">${p.icon}</span>
         <div>
           <div class="text-[13px] font-bold text-white group-hover:text-[#00e5ff]">${p.name}</div>
-          <div class="text-[11px] text-text-secondary">${p.desc}</div>
+          <div class="text-[11px] text-on-surface-variant">${p.desc}</div>
         </div>
       </div>
-      <span class="text-[11px] font-mono text-text-secondary bg-[#15181e] px-2 py-0.5 rounded border border-[#21262d]">Jump to view</span>
+      <span class="text-[11px] font-mono text-on-surface-variant bg-[#15181e] px-2 py-0.5 rounded border border-[#21262d]">Jump to view</span>
     </div>
   `).join('');
 }
@@ -466,8 +479,14 @@ function filterCommandResults(query) {
 // Initial Boot
 document.addEventListener('DOMContentLoaded', () => {
   // Read hash or default to dashboard
-  const hash = window.location.hash.replace('#', '') || 'dashboard';
-  navigateTo(hash, false);
+  const initialHash = (window.location.hash.replace(/^#/, '') || 'dashboard');
+  navigateTo(initialHash, false);
+
+  // Hash change listener for browser back/forward and direct links
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace(/^#/, '') || 'dashboard';
+    navigateTo(hash, false);
+  });
 
   // Setup Hotkeys (Ctrl+K or /)
   window.addEventListener('keydown', (e) => {
@@ -490,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     audioBtn.addEventListener('click', () => {
       if (window.terminalAudio) {
         const isMuted = window.terminalAudio.toggleMute();
-        audioBtn.innerHTML = `<span class="material-symbols-outlined text-[20px]">${isMuted ? 'volume_off' : 'volume_up'}</span>`;
+        audioBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">${isMuted ? 'volume_off' : 'volume_up'}</span>`;
         showToast(isMuted ? 'Terminal audio muted' : 'Terminal audio enabled', 'info');
       }
     });

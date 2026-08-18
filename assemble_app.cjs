@@ -30,6 +30,16 @@ const html = `<!DOCTYPE html>
   <!-- Master Stylesheet -->
   <link rel="stylesheet" href="css/terminal.css"/>
 
+  <!-- Critical View Isolation CSS -->
+  <style>
+    .spa-view {
+      display: none !important;
+    }
+    .spa-view.active-view {
+      display: flex !important;
+    }
+  </style>
+
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",

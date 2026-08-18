@@ -227,14 +227,11 @@ body.enable-crt .crt-overlay {
 
 /* View transitions */
 .spa-view {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.15s ease-in-out;
+  display: none !important;
 }
 
 .spa-view.active-view {
-  display: flex;
-  opacity: 1;
+  display: flex !important;
 }
 
 /* Active Nav Item Indicator */
