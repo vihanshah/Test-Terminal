@@ -4,7 +4,8 @@
   "description": "Black Swan Terminal - Institutional Trading & Simulation Frontend Website",
   "main": "server.cjs",
   "scripts": {
-    "start": "node server.cjs"
+    "start": "node server.cjs",
+    "start:yellow": "node server_stitch_yellow.cjs"
   },
   "keywords": ["trading", "terminal", "finance", "simulation", "black-swan"],
   "author": "",
