@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - BLACK SWAN</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#2a2a2a",
+                      "surface-container-low": "#1c1b1b",
+                      "tertiary-container": "#49ed72",
+                      "on-error-container": "#ffdad6",
+                      "on-primary-container": "#00626e",
+                      "surface-tint": "#00daf3",
+                      "on-tertiary": "#003912",
+                      "on-primary-fixed": "#001f24",
+                      "outline-variant": "#3b494c",
+                      "outline": "#849396",
+                      "surface": "#131313",
+                      "surface-container-highest": "#353534",
+                      "error-container": "#93000a",
+                      "secondary-fixed": "#ffdcbe",
+                      "on-secondary-fixed-variant": "#693c00",
+                      "primary-fixed": "#9cf0ff",
+                      "surface-dim": "#131313",
+                      "tertiary": "#b1ffb5",
+                      "primary-container": "#00e5ff",
+                      "on-surface": "#e5e2e1",
+                      "on-primary-fixed-variant": "#004f58",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-secondary-container": "#653900",
+                      "tertiary-fixed": "#69ff87",
+                      "on-background": "#e5e2e1",
+                      "surface-bright": "#3a3939",
+                      "inverse-on-surface": "#313030",
+                      "on-error": "#690005",
+                      "inverse-surface": "#e5e2e1",
+                      "secondary": "#ffbf81",
+                      "secondary-fixed-dim": "#ffb870",
+                      "on-secondary": "#4a2800",
+                      "secondary-container": "#ff9800",
+                      "primary": "#c3f5ff",
+                      "background": "#131313",
+                      "surface-variant": "#353534",
+                      "error": "#ffb4ab",
+                      "primary-fixed-dim": "#00daf3",
+                      "tertiary-fixed-dim": "#3ce36a",
+                      "inverse-primary": "#006875",
+                      "on-secondary-fixed": "#2c1600",
+                      "on-primary": "#00363d",
+                      "surface-container": "#201f1f",
+                      "on-tertiary-fixed-variant": "#00531e",
+                      "on-surface-variant": "#bac9cc",
+                      "on-tertiary-fixed": "#002108",
+                      "on-tertiary-container": "#006727"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-padding": "12px",
+                      "unit": "4px",
+                      "panel-gap": "8px",
+                      "gutter": "1px",
+                      "table-row-height": "32px"
+              },
+              "fontFamily": {
+                      "data-md": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "data-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "data-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A; /* Base layer depth */
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Fixed-Fluid Hybrid Grid */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .scrollable-canvas {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: grid;
+            gap: 8px; /* panel-gap */
+            grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: min-content;
+        }
+
+        /* 1px Separators for Panels */
+        .panel {
+            background-color: #121212; /* Elevated layer depth */
+            border: 1px solid #2A2A2A;
+            padding: 12px;
+            border-radius: 2px;
+        }
+
+        /* Scrollbar Styling for Terminal Vibe */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2A2A2A; 
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b494c; 
+        }
+
+        /* Form Elements Override */
+        input[type="text"], input[type="password"], select {
+            background-color: #050505;
+            border: 1px solid #2A2A2A;
+            color: #e5e2e1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
+            border-color: #00E5FF;
+            outline: none;
+            box-shadow: none;
+        }
+        
+        /* Toggle Switch Override (Orange for Settings Active State) */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #ff9800; /* Secondary-container orange */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ff9800;
+        }
+    </style>
+</head>
+<body class="antialiased">
+<!-- TopNavBar (JSON Injected) -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant bg-surface flex justify-between items-center h-12 px-container-padding w-full bg-surface">
+<div class="flex items-center gap-6">
+<span class="font-headline-lg text-headline-lg font-black tracking-tighter text-secondary dark:text-secondary">BLACK SWAN</span>
+<div class="flex gap-4">
+<span class="font-data-md text-data-md text-on-surface-variant">NAV: $1,240,502.12</span>
+<span class="font-data-md text-data-md text-tertiary-fixed-dim">+2.45%</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80 hover:bg-surface-container-highest transition-colors">account_balance_wallet</span>
+<span class="material-symbols-outlined text-secondary font-bold cursor-pointer active:opacity-80 hover:bg-surface-container-highest transition-colors" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:opacity-80 hover:bg-surface-container-highest transition-colors">notifications</span>
+</div>
+</header>
+<div class="app-layout pt-12">
+<!-- Main Workspace Canvas -->
+<main class="main-content">
+<div class="scrollable-canvas">
+<!-- Page Title Area (Spans full width) -->
+<div class="col-span-12 panel flex justify-between items-center bg-surface-container-low border-b-0 border-l-0 border-r-0 border-t-2 border-secondary-container rounded-none">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface uppercase tracking-widest">Settings Console</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage institutional account parameters and terminal preferences.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 border border-outline-variant text-on-surface font-label-caps text-label-caps hover:bg-surface-container-highest transition-colors rounded">Discard Changes</button>
+<button class="px-4 py-1.5 bg-primary-container text-on-primary font-label-caps text-label-caps hover:bg-primary-fixed transition-colors rounded">Save Configuration</button>
+</div>
+</div>
+<!-- LEFT COLUMN: User & Terminal -->
+<div class="col-span-12 md:col-span-6 lg:col-span-5 flex flex-col gap-2">
+<!-- User Profile Panel -->
+<section class="panel">
+<div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">person</span>
+<h2 class="font-label-caps text-label-caps text-outline uppercase">User Profile &amp; Identity</h2>
+</div>
+<div class="flex items-start gap-4 mb-6">
+<div class="w-16 h-16 rounded bg-surface-container-highest border border-outline-variant flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A highly detailed portrait avatar of a serious, professional algorithmic trader in a sleek, dimly lit server room. The lighting is cold blue and stark white, creating a high-tech, institutional vibe. Deep shadows contrast with bright, focused highlights. The mood is intense and calculating." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYu2mviAXJ27DgG4-5JEICCLYzGU9H4xe3uoTcnU5i6UwRkWGicg281U8bzJDPNTe-JNVZQMUuOinf-3l4CJGZR425B7MnbtnAbXcRGJs0jUeCYoc1nsidc6HAVcxB8GkFkKV7Hq4AP8LW5ILjDGFFjGMRtVxQvFJ04JDlXS2vY_3vlGcB8dYVgO078eGECYMl59HgYSLhS4j917ZeqZ20R1hyNJVy3A94Z6TQTBeuuyJX0QFL807D"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-baseline">
+<span class="font-data-lg text-data-lg text-on-surface">TRADER_01</span>
+<span class="px-2 py-0.5 bg-surface-container-highest border border-outline-variant rounded font-label-caps text-[10px] text-tertiary-fixed-dim">Institutional Tier</span>
+</div>
+<div class="mt-2 text-on-surface-variant font-data-md text-data-md">
+                                    ID: 0x8A7...3F92<br/>
+                                    Clearance: Level 4
+                                </div>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block font-label-caps text-label-caps text-outline mb-1">API Key (Read/Write)</label>
+<div class="flex">
+<input class="w-full px-2 py-1.5 rounded-l border-r-0 focus:border-secondary-container" readonly="" type="password" value="sk_test_1234567890abcdefghijklmnopqrstuvwxyz"/>
+<button class="px-3 border border-outline-variant border-l-0 rounded-r bg-surface-container-highest hover:bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">visibility</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Terminal Preferences Panel -->
+<section class="panel">
+<div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">tune</span>
+<h2 class="font-label-caps text-label-caps text-outline uppercase">Terminal Preferences</h2>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div>
+<span class="block font-body-md text-body-md text-on-surface">Data Refresh Rate</span>
+<span class="block font-data-md text-[11px] text-on-surface-variant">Websocket polling interval</span>
+</div>
+<select class="px-2 py-1 rounded border-outline-variant focus:border-secondary-container">
+<option>Real-time (0ms)</option>
+<option selected="">Aggressive (50ms)</option>
+<option>Standard (250ms)</option>
+<option>Conservative (1s)</option>
+</select>
+</div>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex justify-between items-center">
+<div>
+<span class="block font-body-md text-body-md text-on-surface">Auditory Alerts</span>
+<span class="block font-data-md text-[11px] text-on-surface-variant">System sounds for execution</span>
+</div>
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-surface border-2 border-outline-variant appearance-none cursor-pointer checked:border-secondary-container" id="sound-toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-surface-container-highest cursor-pointer" for="sound-toggle"></label>
+</div>
+</div>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+<div class="flex justify-between items-center">
+<div>
+<span class="block font-body-md text-body-md text-on-surface">Visual Override Theme</span>
+<span class="block font-data-md text-[11px] text-on-surface-variant">Force specific color maps</span>
+</div>
+<select class="px-2 py-1 rounded border-outline-variant focus:border-secondary-container">
+<option selected="">Institutional Dark</option>
+<option>High Contrast</option>
+<option>Colorblind Safe</option>
+</select>
+</div>
+</div>
+</section>
+</div>
+<!-- RIGHT COLUMN: Security & Defaults -->
+<div class="col-span-12 md:col-span-6 lg:col-span-7 flex flex-col gap-2">
+<!-- Trading Defaults Panel -->
+<section class="panel">
+<div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">account_balance</span>
+<h2 class="font-label-caps text-label-caps text-outline uppercase">Trading Defaults</h2>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block font-label-caps text-label-caps text-outline mb-1">Default Order Size (USD)</label>
+<input class="w-full px-2 py-1.5 rounded focus:border-secondary-container text-right" type="text" value="100,000"/>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-outline mb-1">Max Leverage (Cross)</label>
+<select class="w-full px-2 py-1.5 rounded border-outline-variant focus:border-secondary-container text-right">
+<option>1x</option>
+<option>5x</option>
+<option selected="">10x</option>
+<option>25x (Warning)</option>
+</select>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-outline mb-1">Slippage Tolerance (%)</label>
+<input class="w-full px-2 py-1.5 rounded focus:border-secondary-container text-right" type="text" value="0.10"/>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-outline mb-1">Auto-Cancel Timeout (s)</label>
+<input class="w-full px-2 py-1.5 rounded focus:border-secondary-container text-right" type="text" value="30"/>
+</div>
+</div>
+</section>
+<!-- Security & Session Logs Panel -->
+<section class="panel flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">security</span>
+<h2 class="font-label-caps text-label-caps text-outline uppercase">Security &amp; Access Logs</h2>
+</div>
+<div class="flex items-center justify-between p-3 border border-outline-variant rounded bg-surface-container-highest mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed-dim">verified_user</span>
+<div>
+<span class="block font-data-md text-on-surface">Two-Factor Authentication</span>
+<span class="block font-data-md text-[11px] text-tertiary-fixed-dim">Active (Hardware Key)</span>
+</div>
+</div>
+<button class="px-3 py-1 border border-outline-variant rounded font-label-caps text-label-caps text-on-surface hover:bg-surface-variant transition-colors">Manage</button>
+</div>
+<!-- Technical Data Table for Logs -->
+<div class="flex-1 overflow-auto border border-outline-variant rounded">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-highest sticky top-0 z-10">
+<tr>
+<th class="font-label-caps text-label-caps text-outline px-3 py-2 border-b border-outline-variant uppercase">Timestamp (UTC)</th>
+<th class="font-label-caps text-label-caps text-outline px-3 py-2 border-b border-outline-variant uppercase">IP Address</th>
+<th class="font-label-caps text-label-caps text-outline px-3 py-2 border-b border-outline-variant uppercase">Event</th>
+<th class="font-label-caps text-label-caps text-outline px-3 py-2 border-b border-outline-variant uppercase text-right">Status</th>
+</tr>
+</thead>
+<tbody class="font-data-md text-data-md text-on-surface-variant">
+<tr class="h-[32px] border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-3">2023-10-27 14:32:01</td>
+<td class="px-3">192.168.1.105</td>
+<td class="px-3">Session Login</td>
+<td class="px-3 text-right text-tertiary-fixed-dim">SUCCESS</td>
+</tr>
+<tr class="h-[32px] border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-3">2023-10-27 09:15:44</td>
+<td class="px-3">192.168.1.105</td>
+<td class="px-3">API Key Gen</td>
+<td class="px-3 text-right text-tertiary-fixed-dim">SUCCESS</td>
+</tr>
+<tr class="h-[32px] border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-3">2023-10-26 23:45:12</td>
+<td class="px-3">45.22.109.8</td>
+<td class="px-3">Failed Auth</td>
+<td class="px-3 text-right text-error">REJECTED</td>
+</tr>
+<tr class="h-[32px] border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-3">2023-10-26 18:20:00</td>
+<td class="px-3">192.168.1.105</td>
+<td class="px-3">Settings Upd</td>
+<td class="px-3 text-right text-secondary-container">PENDING</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</body></html>

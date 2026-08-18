@@ -1,0 +1,12 @@
+{
+  "name": "black-swan-terminal",
+  "version": "1.0.0",
+  "description": "Black Swan Terminal - Institutional Trading & Simulation Frontend Website",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs"
+  },
+  "keywords": ["trading", "terminal", "finance", "simulation", "black-swan"],
+  "author": "",
+  "license": "ISC"
+}

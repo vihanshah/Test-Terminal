@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Black Swan - Event &amp; Simulation Rules</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#ff9800",
+                      "on-tertiary-fixed-variant": "#00531e",
+                      "error": "#ffb4ab",
+                      "on-tertiary": "#003912",
+                      "surface-container-high": "#2a2a2a",
+                      "on-tertiary-container": "#006727",
+                      "primary": "#c3f5ff",
+                      "on-primary-fixed": "#001f24",
+                      "inverse-surface": "#e5e2e1",
+                      "on-secondary-fixed": "#2c1600",
+                      "surface": "#131313",
+                      "on-secondary-fixed-variant": "#693c00",
+                      "on-error": "#690005",
+                      "secondary-fixed": "#ffdcbe",
+                      "on-tertiary-fixed": "#002108",
+                      "primary-fixed-dim": "#00daf3",
+                      "on-secondary-container": "#653900",
+                      "surface-tint": "#00daf3",
+                      "surface-variant": "#353534",
+                      "background": "#131313",
+                      "tertiary-fixed": "#69ff87",
+                      "on-primary": "#00363d",
+                      "tertiary-fixed-dim": "#3ce36a",
+                      "surface-dim": "#131313",
+                      "surface-container": "#201f1f",
+                      "on-secondary": "#4a2800",
+                      "on-background": "#e5e2e1",
+                      "outline-variant": "#3b494c",
+                      "secondary": "#ffbf81",
+                      "on-surface-variant": "#bac9cc",
+                      "error-container": "#93000a",
+                      "inverse-on-surface": "#313030",
+                      "tertiary": "#b1ffb5",
+                      "on-primary-container": "#00626e",
+                      "primary-fixed": "#9cf0ff",
+                      "surface-container-low": "#1c1b1b",
+                      "surface-container-highest": "#353534",
+                      "tertiary-container": "#49ed72",
+                      "on-surface": "#e5e2e1",
+                      "outline": "#849396",
+                      "inverse-primary": "#006875",
+                      "surface-bright": "#3a3939",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#ffb870",
+                      "primary-container": "#00e5ff",
+                      "on-primary-fixed-variant": "#004f58",
+                      "warning-yellow": "#fbc02d" // Added to match prompt request specifically
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "1px",
+                      "panel-gap": "8px",
+                      "table-row-height": "32px",
+                      "unit": "4px",
+                      "container-padding": "12px"
+              },
+              "fontFamily": {
+                      "data-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "data-md": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "data-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0e0e0e; /* surface-container-lowest */
+            color: #e5e2e1; /* on-surface */
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .panel {
+            background-color: #131313; /* surface */
+            border: 1px solid #3a3939; /* surface-bright */
+            border-radius: 0.125rem; /* DEFAULT */
+        }
+        
+        .panel-header {
+            background-color: #1c1b1b; /* surface-container-low */
+            border-bottom: 1px solid #3a3939;
+            padding: 8px 12px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #2a2a2a; /* surface-container-high */
+            padding: 8px 12px;
+            align-items: center;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        /* Custom scrollbar for terminal feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e0e0e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff9800;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-full antialiased selection:bg-secondary-container selection:text-black overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-full w-48 bg-surface-container-lowest border-r border-outline-variant py-4 z-10 shrink-0">
+<div class="px-4 mb-6">
+<h1 class="font-headline-md text-headline-md text-secondary-container truncate">Terminal v1.0</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Institutional Access</p>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">dashboard</span><span class="font-data-md text-data-md">Dashboard</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">show_chart</span><span class="font-data-md text-data-md">Markets</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">swap_horiz</span><span class="font-data-md text-data-md">Trade</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">visibility</span><span class="font-data-md text-data-md">Watchlist</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">account_balance_wallet</span><span class="font-data-md text-data-md">Portfolio</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">receipt_long</span><span class="font-data-md text-data-md">Orders</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">history</span><span class="font-data-md text-data-md">Transactions</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">article</span><span class="font-data-md text-data-md">News</span></a></li>
+<li><a class="flex items-center px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">leaderboard</span><span class="font-data-md text-data-md">Leaderboard</span></a></li>
+<!-- Active State Applied Here based on 'Event & Simulation Rules' -->
+<li><a class="flex items-center px-4 py-2 text-secondary-container border-l-2 border-secondary-container bg-surface-container-high font-bold" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 1;">gavel</span><span class="font-data-md text-data-md">Rules</span></a></li>
+</ul>
+</nav>
+<div class="mt-auto pt-4 border-t border-outline-variant px-4">
+<ul class="space-y-1">
+<li><a class="flex items-center py-2 text-on-surface-variant hover:text-on-surface transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">contact_support</span><span class="font-data-md text-data-md">Support</span></a></li>
+<li><a class="flex items-center py-2 text-on-surface-variant hover:text-on-surface transition-all" href="#"><span class="material-symbols-outlined mr-3 text-lg" style="font-variation-settings: 'FILL' 0;">logout</span><span class="font-data-md text-data-md">Logout</span></a></li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-container h-[48px] bg-surface-container-lowest border-b border-outline-variant shrink-0 z-10">
+<div class="flex items-center">
+<span class="font-headline-md text-headline-md uppercase tracking-tighter text-secondary-container md:hidden mr-4">Black Swan</span>
+<!-- Search bar placeholder on left as per JSON -->
+<div class="hidden md:flex items-center bg-surface-container-low border border-surface-bright rounded px-2 py-1 w-64">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-data-md font-data-md text-on-surface w-full p-0 focus:ring-0 placeholder-on-surface-variant" placeholder="Command / Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<button class="text-on-surface-variant hover:text-secondary-container transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-secondary-container transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<button class="text-on-surface-variant hover:text-secondary-container transition-colors"><span class="material-symbols-outlined">help</span></button>
+<div class="w-8 h-8 rounded-full bg-surface-bright border border-outline-variant overflow-hidden">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A small circular avatar image showing a highly stylized, high-contrast digital wireframe of a human profile in neon cyan and orange against a dark void, representing a professional trader profile icon." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ9ucOMLQlTNyM8mWXylsSjGf2yAsy3fopcOBC8L2YoUThJ8GETVVK8w4plTNuykQGFzY_IQKf0Dz2GwjXQGTsMcJ3LrN2t_1ODGGSh3Ar5OQn18Wcxn7jbPEWfePjnp1QcVuNjRCEjDEnmFAvydBWdF-RuhpDPQiDzLcx-5Isaz30eCqoa_uCmcXr4tAC4wb2yjT0FWwXJaI_bMlP8px--9A4AudWG6OmQwAnFRXLeEJOStuVJ8gc"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 overflow-y-auto p-panel-gap">
+<!-- Page Title -->
+<div class="mb-panel-gap flex justify-between items-end pb-2 border-b border-surface-bright">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">SIMULATION PARAMETERS &amp; RULES</h2>
+<p class="font-data-md text-data-md text-secondary-container mt-1 uppercase opacity-90">Protocol Version 4.2.1 // Strict Compliance Enforced</p>
+</div>
+<div class="text-right hidden sm:block">
+<span class="font-data-md text-data-md text-warning-yellow flex items-center"><span class="material-symbols-outlined text-sm mr-1">warning</span> Active Monitoring</span>
+</div>
+</div>
+<!-- Main Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-panel-gap">
+<!-- Left Column (Core Specs) -->
+<div class="lg:col-span-4 flex flex-col gap-panel-gap">
+<!-- Competition Parameters Panel -->
+<div class="panel flex-col flex h-auto">
+<div class="panel-header flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Competition Parameters</span>
+<span class="material-symbols-outlined text-secondary-container text-sm">settings_applications</span>
+</div>
+<div class="p-0">
+<div class="data-row">
+<span class="font-body-md text-body-md text-on-surface">Starting Capital</span>
+<span class="font-data-lg text-data-lg text-secondary-container font-bold">$10,000,000.00</span>
+</div>
+<div class="data-row">
+<span class="font-body-md text-body-md text-on-surface">Duration</span>
+<span class="font-data-md text-data-md text-on-surface">30 Days</span>
+</div>
+<div class="data-row flex-col items-start gap-2">
+<span class="font-body-md text-body-md text-on-surface w-full">Eligible Asset Classes</span>
+<div class="flex flex-wrap gap-2 mt-1">
+<span class="px-2 py-1 bg-surface-container-low border border-surface-bright rounded text-[10px] font-data-md text-on-surface">EQUITIES</span>
+<span class="px-2 py-1 bg-surface-container-low border border-surface-bright rounded text-[10px] font-data-md text-on-surface">CRYPTO</span>
+<span class="px-2 py-1 bg-surface-container-low border border-surface-bright rounded text-[10px] font-data-md text-on-surface">COMMODITIES</span>
+<span class="px-2 py-1 bg-surface-container-low border border-surface-bright rounded text-[10px] font-data-md text-on-surface">REAL ESTATE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Trading Constraints Panel -->
+<div class="panel flex-col flex h-auto">
+<div class="panel-header flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Trading Constraints</span>
+<span class="material-symbols-outlined text-warning-yellow text-sm">front_hand</span>
+</div>
+<div class="p-0">
+<div class="data-row">
+<span class="font-body-md text-body-md text-on-surface">Max Position Size</span>
+<span class="font-data-md text-data-md text-warning-yellow">15% of NAV</span>
+</div>
+<div class="data-row">
+<span class="font-body-md text-body-md text-on-surface">Daily Drawdown Limit</span>
+<span class="font-data-md text-data-md text-error">5.00%</span>
+</div>
+<div class="p-3 bg-surface-container-low border-b border-surface-container-high">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase block mb-2">Leverage Limits</span>
+<div class="flex justify-between items-center mb-1">
+<span class="font-data-md text-data-md text-on-surface">Equities</span>
+<span class="font-data-md text-data-md text-on-surface">2.0x</span>
+</div>
+<div class="w-full bg-surface h-1 mb-3">
+<div class="bg-secondary-container h-1" style="width: 50%;"></div>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-data-md text-data-md text-on-surface">Crypto</span>
+<span class="font-data-md text-data-md text-on-surface">1.0x (No Margin)</span>
+</div>
+<div class="w-full bg-surface h-1">
+<div class="bg-outline-variant h-1" style="width: 25%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Center & Right Columns (Protocols & Details) -->
+<div class="lg:col-span-8 flex flex-col gap-panel-gap">
+<!-- Black Swan Protocol (Highlight Panel) -->
+<div class="panel flex-col flex border-l-2 border-l-warning-yellow">
+<div class="panel-header flex justify-between items-center bg-[rgba(251,192,45,0.05)]">
+<span class="font-label-caps text-label-caps text-warning-yellow uppercase tracking-widest flex items-center"><span class="material-symbols-outlined text-sm mr-2">qr_code_2</span> 'Black Swan' Event Protocol</span>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                                The simulation engine is designed to test resilience against extreme, unforeseen market anomalies. Participants must maintain robust risk management frameworks as the environment will inject systemic shocks without warning.
+                            </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+<div class="bg-surface-container-low p-3 border border-surface-bright rounded hover:border-warning-yellow transition-colors">
+<span class="material-symbols-outlined text-warning-yellow block mb-2">moving</span>
+<h4 class="font-data-md text-data-md text-on-surface mb-1 uppercase font-bold">Volatility Spikes</h4>
+<p class="font-data-md text-[11px] text-on-surface-variant leading-tight">Randomized multi-sigma moves in specific sectors lasting 1-4 hours.</p>
+</div>
+<div class="bg-surface-container-low p-3 border border-surface-bright rounded hover:border-warning-yellow transition-colors">
+<span class="material-symbols-outlined text-warning-yellow block mb-2">water_drop</span>
+<h4 class="font-data-md text-data-md text-on-surface mb-1 uppercase font-bold">Liquidity Shocks</h4>
+<p class="font-data-md text-[11px] text-on-surface-variant leading-tight">Bid/ask spreads widen massively; order fills delayed or partially rejected.</p>
+</div>
+<div class="bg-surface-container-low p-3 border border-surface-bright rounded hover:border-warning-yellow transition-colors">
+<span class="material-symbols-outlined text-warning-yellow block mb-2">dns</span>
+<h4 class="font-data-md text-data-md text-on-surface mb-1 uppercase font-bold">System Outages</h4>
+<p class="font-data-md text-[11px] text-on-surface-variant leading-tight">Simulated exchange API downtime. Open positions cannot be closed during window.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Lower Grid for Scoring & Prohibitions -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-panel-gap flex-1">
+<!-- Scoring Logic -->
+<div class="panel flex-col flex h-auto">
+<div class="panel-header">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Scoring Logic</span>
+</div>
+<div class="p-4 flex flex-col justify-center gap-4 flex-1">
+<div class="text-center p-4 bg-surface-container-low border border-secondary-container rounded">
+<span class="font-label-caps text-label-caps text-secondary-container uppercase block mb-1">Primary Metric</span>
+<span class="font-headline-md text-headline-md text-on-surface block">Risk-Adjusted Return</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-lowest border border-surface-bright p-3 text-center">
+<span class="font-data-md text-data-md text-on-surface-variant block mb-1">Max Drawdown</span>
+<span class="font-data-md text-data-md text-on-surface">25% Weight</span>
+</div>
+<div class="bg-surface-container-lowest border border-surface-bright p-3 text-center">
+<span class="font-data-md text-data-md text-on-surface-variant block mb-1">Sharpe Ratio</span>
+<span class="font-data-md text-data-md text-on-surface">35% Weight</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Prohibited Activities -->
+<div class="panel flex-col flex h-auto border-t-2 border-t-error">
+<div class="panel-header bg-[rgba(105,0,5,0.2)]">
+<span class="font-label-caps text-label-caps text-error uppercase tracking-widest flex items-center"><span class="material-symbols-outlined text-sm mr-2">block</span> Prohibited Activities</span>
+</div>
+<div class="p-0">
+<ul class="divide-y divide-surface-container-high">
+<li class="p-3 flex items-start">
+<span class="material-symbols-outlined text-error text-sm mr-3 mt-0.5">close</span>
+<div>
+<span class="font-data-md text-data-md text-on-surface block">Insider Trading Simulation</span>
+<span class="font-body-md text-[12px] text-on-surface-variant mt-1 block">Utilizing future-knowledge data leaks provided by third-party simulation tools.</span>
+</div>
+</li>
+<li class="p-3 flex items-start">
+<span class="material-symbols-outlined text-error text-sm mr-3 mt-0.5">close</span>
+<div>
+<span class="font-data-md text-data-md text-on-surface block">Wash Trading</span>
+<span class="font-body-md text-[12px] text-on-surface-variant mt-1 block">Executing simultaneous buy/sell orders on illiquid simulated assets to manipulate volume metrics.</span>
+</div>
+</li>
+<li class="p-3 flex items-start">
+<span class="material-symbols-outlined text-error text-sm mr-3 mt-0.5">close</span>
+<div>
+<span class="font-data-md text-data-md text-on-surface block">Exploit Usage</span>
+<span class="font-body-md text-[12px] text-on-surface-variant mt-1 block">Leveraging latency arbitrage or pricing engine bugs will result in immediate disqualification.</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

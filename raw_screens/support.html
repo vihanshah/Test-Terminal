@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Black Swan Terminal - Support &amp; Logs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-low": "#1c1b1b",
+                        "tertiary-container": "#49ed72",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#00626e",
+                        "surface-tint": "#00daf3",
+                        "on-tertiary": "#003912",
+                        "on-primary-fixed": "#001f24",
+                        "outline-variant": "#3b494c",
+                        "outline": "#849396",
+                        "surface": "#131313",
+                        "surface-container-highest": "#353534",
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#ffdcbe",
+                        "on-secondary-fixed-variant": "#693c00",
+                        "primary-fixed": "#9cf0ff",
+                        "surface-dim": "#131313",
+                        "tertiary": "#b1ffb5",
+                        "primary-container": "#00e5ff",
+                        "on-surface": "#e5e2e1",
+                        "on-primary-fixed-variant": "#004f58",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-container": "#653900",
+                        "tertiary-fixed": "#69ff87",
+                        "on-background": "#e5e2e1",
+                        "surface-bright": "#3a3939",
+                        "inverse-on-surface": "#313030",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary": "#ffbf81",
+                        "secondary-fixed-dim": "#ffb870",
+                        "on-secondary": "#4a2800",
+                        "secondary-container": "#ff9800",
+                        "primary": "#c3f5ff",
+                        "background": "#131313",
+                        "surface-variant": "#353534",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#00daf3",
+                        "tertiary-fixed-dim": "#3ce36a",
+                        "inverse-primary": "#006875",
+                        "on-secondary-fixed": "#2c1600",
+                        "on-primary": "#00363d",
+                        "surface-container": "#201f1f",
+                        "on-tertiary-fixed-variant": "#00531e",
+                        "on-surface-variant": "#bac9cc",
+                        "on-tertiary-fixed": "#002108",
+                        "on-tertiary-container": "#006727"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-padding": "12px",
+                        "unit": "4px",
+                        "panel-gap": "8px",
+                        "gutter": "1px",
+                        "table-row-height": "32px"
+                    },
+                    "fontFamily": {
+                        "data-md": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-lg": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-md": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "data-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #131313; color: #e5e2e1; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bg-panel { background-color: #121212; }
+        .border-panel { border-color: #2A2A2A; }
+    </style>
+</head>
+<body class="font-body-md text-body-md h-screen overflow-hidden flex flex-col bg-background">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 border-b border-outline-variant flat no shadows flex justify-between items-center h-12 px-container-padding bg-surface dark:bg-surface">
+<div class="flex items-center gap-4">
+<span class="font-headline-lg text-headline-lg font-black tracking-tighter text-secondary dark:text-secondary">BLACK SWAN</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<span class="font-data-md text-data-md text-secondary">NAV: $1,240,502.12</span>
+<span class="font-data-md text-data-md text-tertiary-fixed-dim">+2.45%</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80 p-1 rounded">account_balance_wallet</span>
+<span class="material-symbols-outlined text-secondary hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80 p-1 rounded">settings</span>
+<span class="material-symbols-outlined text-secondary hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80 p-1 rounded">notifications</span>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 pt-12 h-full">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 border-r border-outline-variant flat no shadows flex flex-col pt-12 pb-4 bg-surface-container-low dark:bg-surface-container-low transition-all duration-150 ease-in-out hidden md:flex">
+<div class="px-container-padding py-4 border-b border-outline-variant mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-secondary">TRADER_01</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">Institutional Tier</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-2 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">show_chart</span>
+<span class="font-label-caps text-label-caps">Markets</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+<span class="font-label-caps text-label-caps">Trade</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+<span class="font-label-caps text-label-caps">Watchlist</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">pie_chart</span>
+<span class="font-label-caps text-label-caps">Portfolio</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">list_alt</span>
+<span class="font-label-caps text-label-caps">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<span class="font-label-caps text-label-caps">Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">newspaper</span>
+<span class="font-label-caps text-label-caps">News</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">leaderboard</span>
+<span class="font-label-caps text-label-caps">Leaderboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">event</span>
+<span class="font-label-caps text-label-caps">Events</span>
+</a>
+</div>
+<div class="px-2 mt-auto border-t border-outline-variant pt-2 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded bg-surface-container-highest border-l-2 border-secondary text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+<span class="font-label-caps text-label-caps">Logs</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 ml-0 md:ml-64 p-panel-gap overflow-y-auto bg-surface-dim h-full">
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-panel-gap h-full">
+<!-- Left Column: System Status & Docs -->
+<div class="xl:col-span-8 flex flex-col gap-panel-gap">
+<!-- System Status Dashboard -->
+<div class="bg-panel border border-panel rounded-DEFAULT p-container-padding flex flex-col gap-4">
+<div class="flex justify-between items-center border-b border-panel pb-2">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase">System Status</h2>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-data-md text-data-md text-on-surface-variant">All Systems Operational</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-panel-gap">
+<!-- API Status -->
+<div class="border border-panel rounded-DEFAULT p-3 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant">API ENDPOINTS</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim">check_circle</span>
+</div>
+<div class="font-data-lg text-data-lg text-tertiary-fixed-dim">99.99%</div>
+<div class="font-data-md text-data-md text-on-surface-variant text-[11px]">Latency: 12ms</div>
+</div>
+<!-- Order Engine -->
+<div class="border border-panel rounded-DEFAULT p-3 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ORDER ENGINE</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim">check_circle</span>
+</div>
+<div class="font-data-lg text-data-lg text-tertiary-fixed-dim">OPERATIONAL</div>
+<div class="font-data-md text-data-md text-on-surface-variant text-[11px]">TPS: 4,205</div>
+</div>
+<!-- Data Feeds -->
+<div class="border border-panel rounded-DEFAULT p-3 flex flex-col gap-2 bg-surface-container-high border-secondary-container/30">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-secondary-container">DATA FEEDS</span>
+<span class="material-symbols-outlined text-[16px] text-secondary-container">warning</span>
+</div>
+<div class="font-data-lg text-data-lg text-secondary-container">DEGRADED</div>
+<div class="font-data-md text-data-md text-on-surface-variant text-[11px]">L2 Book Delay: ~50ms</div>
+</div>
+</div>
+<!-- Mini Log Stream -->
+<div class="bg-[#050505] border border-panel rounded-DEFAULT p-2 h-32 overflow-y-auto font-data-md text-[11px] text-on-surface-variant flex flex-col gap-1">
+<div class="flex gap-4"><span class="text-tertiary-fixed-dim">[14:02:45]</span><span>SYS_OK: Connection pool refreshed.</span></div>
+<div class="flex gap-4"><span class="text-secondary-container">[14:02:42]</span><span>WARN_FEED: Primary websocket lag spike detected on binance_f.</span></div>
+<div class="flex gap-4"><span class="text-tertiary-fixed-dim">[14:02:40]</span><span>SYS_OK: Heartbeat acknowledged.</span></div>
+<div class="flex gap-4"><span class="text-tertiary-fixed-dim">[14:02:35]</span><span>SYS_OK: Heartbeat acknowledged.</span></div>
+<div class="flex gap-4"><span class="text-tertiary-fixed-dim">[14:02:30]</span><span>SYS_OK: Heartbeat acknowledged.</span></div>
+</div>
+</div>
+<!-- Knowledge Base & Docs -->
+<div class="bg-panel border border-panel rounded-DEFAULT p-container-padding flex-1 flex flex-col">
+<div class="flex justify-between items-center border-b border-panel pb-2 mb-4">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase">Technical Documentation</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-[16px] text-on-surface-variant">search</span>
+<input class="bg-[#050505] border border-panel text-data-md font-data-md text-on-surface pl-8 pr-2 py-1 focus:border-primary-container focus:ring-0 w-64 rounded-sm outline-none" placeholder="Search docs..." type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-panel-gap">
+<!-- Doc Link -->
+<a class="border border-panel rounded-DEFAULT p-3 hover:border-outline-variant transition-colors group flex items-start gap-3" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors mt-1 text-[20px]">api</span>
+<div>
+<h3 class="font-headline-md text-[14px] text-on-surface group-hover:text-primary-container transition-colors mb-1">REST API Reference</h3>
+<p class="font-data-md text-[12px] text-on-surface-variant">Comprehensive guide to endpoints, rate limits, and authentication.</p>
+</div>
+</a>
+<!-- Doc Link -->
+<a class="border border-panel rounded-DEFAULT p-3 hover:border-outline-variant transition-colors group flex items-start gap-3" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors mt-1 text-[20px]">gavel</span>
+<div>
+<h3 class="font-headline-md text-[14px] text-on-surface group-hover:text-primary-container transition-colors mb-1">Trading Rules &amp; Limits</h3>
+<p class="font-data-md text-[12px] text-on-surface-variant">Position sizing, leverage constraints, and margin requirements.</p>
+</div>
+</a>
+<!-- Doc Link -->
+<a class="border border-panel rounded-DEFAULT p-3 hover:border-outline-variant transition-colors group flex items-start gap-3" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors mt-1 text-[20px]">bolt</span>
+<div>
+<h3 class="font-headline-md text-[14px] text-on-surface group-hover:text-primary-container transition-colors mb-1">Event Protocols</h3>
+<p class="font-data-md text-[12px] text-on-surface-variant">System behavior during high volatility and black swan events.</p>
+</div>
+</a>
+<!-- Doc Link -->
+<a class="border border-panel rounded-DEFAULT p-3 hover:border-outline-variant transition-colors group flex items-start gap-3" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors mt-1 text-[20px]">cable</span>
+<div>
+<h3 class="font-headline-md text-[14px] text-on-surface group-hover:text-primary-container transition-colors mb-1">Websocket Streams</h3>
+<p class="font-data-md text-[12px] text-on-surface-variant">Subscribing to L2 orderbook, trades, and account updates.</p>
+</div>
+</a>
+</div>
+</div>
+</div>
+<!-- Right Column: Support Tickets & Contact -->
+<div class="xl:col-span-4 flex flex-col gap-panel-gap h-full">
+<!-- Direct Contact -->
+<div class="bg-panel border border-panel rounded-DEFAULT p-container-padding">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase border-b border-panel pb-2 mb-4">Direct Operator Access</h2>
+<div class="space-y-4">
+<div class="bg-surface-container-high border border-panel rounded-DEFAULT p-4 flex flex-col items-center text-center gap-2">
+<span class="material-symbols-outlined text-[32px] text-secondary">headset_mic</span>
+<div class="font-headline-md text-[16px] text-on-surface">Institutional Desk</div>
+<div class="font-data-md text-[12px] text-on-surface-variant">Priority 24/7 access for Tier 1 clients.</div>
+<button class="w-full mt-2 bg-secondary text-on-secondary font-label-caps text-label-caps py-2 rounded-sm hover:opacity-90 transition-opacity">INITIATE SECURE CHAT</button>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 border border-panel bg-[#050505] text-on-surface font-label-caps text-label-caps py-2 rounded-sm hover:border-outline-variant transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">mail</span> EMAIL DESK
+                                </button>
+<button class="flex-1 border border-panel bg-[#050505] text-on-surface font-label-caps text-label-caps py-2 rounded-sm hover:border-outline-variant transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">call</span> PHONE
+                                </button>
+</div>
+</div>
+</div>
+<!-- Recent Tickets -->
+<div class="bg-panel border border-panel rounded-DEFAULT flex-1 flex flex-col overflow-hidden">
+<div class="p-container-padding flex justify-between items-center border-b border-panel">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase">Recent Tickets</h2>
+<button class="text-secondary font-label-caps text-label-caps hover:underline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">add</span> NEW
+                            </button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-[#0A0A0A] border-b border-panel font-label-caps text-label-caps text-on-surface-variant sticky top-0">
+<tr>
+<th class="py-2 px-3 font-normal">ID</th>
+<th class="py-2 px-3 font-normal">SUBJECT</th>
+<th class="py-2 px-3 font-normal text-right">STATUS</th>
+</tr>
+</thead>
+<tbody class="font-data-md text-data-md text-on-surface divide-y divide-[#2A2A2A]">
+<tr class="hover:bg-surface-container-high cursor-pointer transition-colors h-table-row-height">
+<td class="py-1 px-3 text-on-surface-variant">#T-8921</td>
+<td class="py-1 px-3 truncate max-w-[120px]">API Rate Limit Increase Request</td>
+<td class="py-1 px-3 text-right text-secondary">PENDING</td>
+</tr>
+<tr class="hover:bg-surface-container-high cursor-pointer transition-colors h-table-row-height">
+<td class="py-1 px-3 text-on-surface-variant">#T-8845</td>
+<td class="py-1 px-3 truncate max-w-[120px]">Missing Trade Ledger Export</td>
+<td class="py-1 px-3 text-right text-tertiary-fixed-dim">RESOLVED</td>
+</tr>
+<tr class="hover:bg-surface-container-high cursor-pointer transition-colors h-table-row-height">
+<td class="py-1 px-3 text-on-surface-variant">#T-8712</td>
+<td class="py-1 px-3 truncate max-w-[120px]">Margin Liquidation Query (BTC-PERP)</td>
+<td class="py-1 px-3 text-right text-tertiary-fixed-dim">RESOLVED</td>
+</tr>
+<tr class="hover:bg-surface-container-high cursor-pointer transition-colors h-table-row-height">
+<td class="py-1 px-3 text-on-surface-variant">#T-8601</td>
+<td class="py-1 px-3 truncate max-w-[120px]">Sub-account Creation Limits</td>
+<td class="py-1 px-3 text-right text-tertiary-fixed-dim">RESOLVED</td>
+</tr>
+<tr class="hover:bg-surface-container-high cursor-pointer transition-colors h-table-row-height">
+<td class="py-1 px-3 text-on-surface-variant">#T-8433</td>
+<td class="py-1 px-3 truncate max-w-[120px]">Websocket Disconnection Logs</td>
+<td class="py-1 px-3 text-right text-outline-variant">CLOSED</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

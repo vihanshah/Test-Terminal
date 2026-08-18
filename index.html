@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Black Swan Terminal | Institutional Trading System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+  
+  <!-- Master Stylesheet -->
+  <link rel="stylesheet" href="css/terminal.css"/>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#00e5ff",
+            "primary-container": "#00626e",
+            "on-primary": "#001f24",
+            "secondary": "#ff9800",
+            "secondary-container": "#ff9800",
+            "tertiary": "#00e676",
+            "error": "#ff3d57",
+            "background": "#060708",
+            "surface": "#0e1013",
+            "surface-elevated": "#15181e",
+            "surface-variant": "#1b2028",
+            "on-background": "#e6edf3",
+            "on-surface": "#e6edf3",
+            "on-surface-variant": "#8b949e",
+            "outline": "#21262d",
+            "outline-variant": "#30363d"
+          },
+          fontFamily: {
+            "sans": ["Inter", "sans-serif"],
+            "mono": ["JetBrains Mono", "IBM Plex Mono", "monospace"],
+            "body-md": ["Inter", "sans-serif"],
+            "data-md": ["JetBrains Mono", "monospace"],
+            "data-lg": ["JetBrains Mono", "monospace"],
+            "label-caps": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-sans h-screen w-screen overflow-hidden flex flex-col selection:bg-primary selection:text-black">
+  
+  <!-- CRT Scanline Effect Overlay (Toggled in Settings) -->
+  <div class="crt-overlay"></div>
+
+  <!-- Crisis Banner (Triggered by Black Swan Events) -->
+  <div id="black-swan-alert-banner" class="hidden black-swan-banner px-4 py-2 flex items-center justify-between z-50 shrink-0">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#ff3d57] text-[20px] animate-pulse">warning</span>
+      <span id="black-swan-alert-text" class="text-[12px] font-mono text-white"></span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="navigateTo('simulation')" class="px-2.5 py-1 bg-[#ff3d57]/30 hover:bg-[#ff3d57]/50 text-white rounded text-[11px] font-mono font-bold border border-[#ff3d57]">VIEW SIMULATOR</button>
+      <button onclick="triggerBlackSwanShock('reset')" class="px-2.5 py-1 bg-[#21262d] hover:bg-[#30363d] text-text-secondary rounded text-[11px] font-mono">DISMISS</button>
+    </div>
+  </div>
+
+  <!-- Master Top AppBar -->
+  <header class="h-[50px] bg-surface border-b border-outline flex items-center justify-between px-4 font-mono shrink-0 z-30">
+    <div class="flex items-center gap-4">
+      <!-- Logo / System Tag -->
+      <a href="#dashboard" onclick="navigateTo('dashboard')" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-primary text-black font-extrabold text-[13px] rounded-sm tracking-tighter">
+          BS
+        </div>
+        <div class="flex flex-col">
+          <span class="font-bold text-primary tracking-wider uppercase text-[13px] leading-tight group-hover:text-white transition-colors">BLACK SWAN</span>
+          <span class="text-on-surface-variant text-[10px] tracking-widest uppercase">PRO TERMINAL v4.8</span>
+        </div>
+      </a>
+
+      <div class="h-5 w-px bg-outline mx-2 hidden sm:block"></div>
+
+      <!-- Market Status Pill -->
+      <div class="hidden sm:flex items-center gap-3 text-[12px]">
+        <span class="text-on-surface-variant">DAY <strong class="text-white">04/10</strong></span>
+        <span class="text-outline">|</span>
+        <div class="flex items-center gap-1.5">
+          <span class="status-beacon bg-tertiary"></span>
+          <span class="text-tertiary font-bold tracking-wider uppercase text-[11px]">MARKET OPEN</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Search & Command Palette Trigger -->
+    <div class="flex items-center gap-4">
+      <div onclick="openCommandPalette()" class="hidden md:flex items-center bg-[#060708] border border-outline hover:border-primary px-3 py-1.5 w-72 rounded cursor-pointer transition-all group">
+        <span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary mr-2">search</span>
+        <span class="text-on-surface-variant text-[12px] flex-1">Search Tickers or Commands...</span>
+        <kbd class="text-[10px] bg-[#15181e] border border-outline px-1.5 py-0.5 rounded text-on-surface-variant">Ctrl+K</kbd>
+      </div>
+
+      <!-- Quick Portfolio Value Chip -->
+      <div class="flex items-center gap-3 bg-[#060708] border border-outline rounded px-3 py-1 text-[12px]">
+        <span class="text-on-surface-variant text-[11px] uppercase">PORTFOLIO:</span>
+        <span id="header-portfolio-val" class="text-white font-bold text-[13px]">₹10,84,250.00</span>
+        <span id="header-portfolio-pnl" class="text-tertiary bg-[#006727]/30 px-1.5 py-0.5 rounded text-[11px] font-bold">+1.72%</span>
+      </div>
+    </div>
+
+    <!-- Right Header Controls -->
+    <div class="flex items-center gap-2 text-on-surface-variant">
+      <button id="header-audio-toggle" title="Toggle Terminal Audio" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors">
+        <span class="material-symbols-outlined text-[18px]">volume_up</span>
+      </button>
+      <button onclick="openCommandPalette()" title="Command Palette" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors">
+        <span class="material-symbols-outlined text-[18px]">terminal</span>
+      </button>
+      <button id="header-fullscreen-toggle" title="Fullscreen Toggle" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors">
+        <span class="material-symbols-outlined text-[18px]">fullscreen</span>
+      </button>
+      <button onclick="navigateTo('settings')" title="Terminal Settings" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors">
+        <span class="material-symbols-outlined text-[18px]">settings</span>
+      </button>
+      
+      <div class="h-5 w-px bg-outline mx-1"></div>
+
+      <!-- User Profile Badge -->
+      <div onclick="navigateTo('settings')" class="flex items-center gap-2 px-2 py-1 bg-[#15181e] hover:bg-[#1b2028] border border-outline rounded cursor-pointer transition-colors">
+        <div class="w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary flex items-center justify-center text-[11px] font-bold">
+          BS
+        </div>
+        <span class="text-[12px] font-bold text-white hidden lg:inline">QUANT_07</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Market Ticker Marquee -->
+  <div class="h-[32px] ticker-wrap flex items-center font-mono text-[12px] shrink-0">
+    <div class="ticker-content flex items-center">
+      <span class="mx-5"><span class="text-on-surface-variant">NIFTY 50</span> <span data-ticker="NIFTY 50" class="ml-1.5 text-white font-bold">22,514.65</span> <span class="text-tertiary ml-1.5">+0.45%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">SENSEX</span> <span data-ticker="SENSEX" class="ml-1.5 text-white font-bold">74,221.05</span> <span class="text-tertiary ml-1.5">+0.38%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">BANK NIFTY</span> <span data-ticker="BANK NIFTY" class="ml-1.5 text-white font-bold">48,159.00</span> <span class="text-error ml-1.5">-0.12%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">GOLD</span> <span data-ticker="GOLD" class="ml-1.5 text-white font-bold">71,850.00</span> <span class="text-tertiary ml-1.5">+1.10%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">BTC/USD</span> <span data-ticker="BTC/USD" class="ml-1.5 text-white font-bold">64,231.00</span> <span class="text-tertiary ml-1.5">+1.20%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">ETH/USD</span> <span data-ticker="ETH/USD" class="ml-1.5 text-white font-bold">3,485.50</span> <span class="text-tertiary ml-1.5">+2.15%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">RELIANCE</span> <span data-ticker="RELIANCE" class="ml-1.5 text-white font-bold">2,945.60</span> <span class="text-error ml-1.5">-0.42%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">TCS</span> <span data-ticker="TCS" class="ml-1.5 text-white font-bold">4,012.25</span> <span class="text-tertiary ml-1.5">+1.15%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">INFY</span> <span data-ticker="INFY" class="ml-1.5 text-white font-bold">1,560.80</span> <span class="text-tertiary ml-1.5">+0.85%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">MUMBAI METRO</span> <span data-ticker="MUMBAI METRO" class="ml-1.5 text-white font-bold">148,000.00</span> <span class="text-error ml-1.5">-1.33%</span></span>
+      <span class="text-outline">|</span>
+      
+      <!-- Duplicate for seamless infinite loop -->
+      <span class="mx-5"><span class="text-on-surface-variant">NIFTY 50</span> <span data-ticker="NIFTY 50" class="ml-1.5 text-white font-bold">22,514.65</span> <span class="text-tertiary ml-1.5">+0.45%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">SENSEX</span> <span data-ticker="SENSEX" class="ml-1.5 text-white font-bold">74,221.05</span> <span class="text-tertiary ml-1.5">+0.38%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">BANK NIFTY</span> <span data-ticker="BANK NIFTY" class="ml-1.5 text-white font-bold">48,159.00</span> <span class="text-error ml-1.5">-0.12%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">GOLD</span> <span data-ticker="GOLD" class="ml-1.5 text-white font-bold">71,850.00</span> <span class="text-tertiary ml-1.5">+1.10%</span></span>
+      <span class="text-outline">|</span>
+      <span class="mx-5"><span class="text-on-surface-variant">BTC/USD</span> <span data-ticker="BTC/USD" class="ml-1.5 text-white font-bold">64,231.00</span> <span class="text-tertiary ml-1.5">+1.20%</span></span>
+    </div>
+  </div>
+
+  <!-- Body Content: Sidebar + Active View -->
+  <div class="flex-1 flex overflow-hidden min-h-0">
+    
+    <!-- Master Sidebar Navigation -->
+    <nav class="w-[200px] xl:w-[220px] bg-surface border-r border-outline flex flex-col py-3 z-20 shrink-0 overflow-y-auto font-sans">
+      
+      <!-- Primary Core Nav -->
+      <div class="flex flex-col gap-0.5 px-2">
+        <a href="#dashboard" onclick="navigateTo('dashboard')" data-view="dashboard" class="nav-item active h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">dashboard</span>
+          <span class="font-medium">Dashboard</span>
+        </a>
+
+        <a href="#markets" onclick="navigateTo('markets')" data-view="markets" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">show_chart</span>
+          <span class="font-medium">Markets</span>
+        </a>
+
+        <a href="#trade" onclick="navigateTo('trade')" data-view="trade" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+          <span class="font-medium">Trade Terminal</span>
+          <span class="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        </a>
+
+        <a href="#watchlist" onclick="navigateTo('watchlist')" data-view="watchlist" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">visibility</span>
+          <span class="font-medium">Watchlist</span>
+        </a>
+
+        <a href="#portfolio" onclick="navigateTo('portfolio')" data-view="portfolio" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+          <span class="font-medium">Portfolio</span>
+        </a>
+
+        <a href="#orders" onclick="navigateTo('orders')" data-view="orders" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          <span class="font-medium">Orders</span>
+          <span class="ml-auto bg-[#21262d] text-primary text-[10px] font-mono px-1.5 py-0.2 rounded">3</span>
+        </a>
+
+        <a href="#transactions" onclick="navigateTo('transactions')" data-view="transactions" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">list_alt</span>
+          <span class="font-medium">Transactions</span>
+        </a>
+
+        <a href="#news" onclick="navigateTo('news')" data-view="news" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">newspaper</span>
+          <span class="font-medium">News & Wire</span>
+          <span class="ml-auto text-tertiary text-[10px] font-mono font-bold">LIVE</span>
+        </a>
+
+        <div class="h-px bg-outline my-2 mx-1"></div>
+        <div class="px-3 py-1 text-[10px] font-bold tracking-wider text-on-surface-variant uppercase font-mono">ARENA & RULES</div>
+
+        <a href="#leaderboard" onclick="navigateTo('leaderboard')" data-view="leaderboard" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">leaderboard</span>
+          <span class="font-medium">Leaderboard</span>
+          <span class="ml-auto text-secondary text-[10px] font-mono font-bold">#7</span>
+        </a>
+
+        <a href="#simulation" onclick="navigateTo('simulation')" data-view="simulation" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">gavel</span>
+          <span class="font-medium">Event & Rules</span>
+          <span class="ml-auto bg-[#ff3d57]/20 text-[#ff3d57] text-[10px] font-mono px-1 rounded font-bold">SHOCK</span>
+        </a>
+      </div>
+
+      <!-- Bottom Nav (Settings & Support) -->
+      <div class="mt-auto flex flex-col gap-0.5 px-2 pt-3 border-t border-outline">
+        <a href="#settings" onclick="navigateTo('settings')" data-view="settings" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span class="font-medium">Settings</span>
+        </a>
+
+        <a href="#support" onclick="navigateTo('support')" data-view="support" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px]">
+          <span class="material-symbols-outlined text-[18px]">contact_support</span>
+          <span class="font-medium">Support & Logs</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Dynamic SPA Views Container -->
+    <main id="app-viewport" class="flex-1 flex flex-col h-full min-w-0 bg-background overflow-hidden relative">
+
+      <!-- ============================================================== -->
+      <!-- VIEW 1: DASHBOARD                                              -->
+      <!-- ============================================================== -->
+      <section id="view-dashboard" class="spa-view active-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <!-- Top Portfolio Metrics Strip -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+          
+          <div class="terminal-panel p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider">TOTAL PORTFOLIO VALUE</span>
+              <span class="text-[11px] font-mono text-primary bg-primary/10 border border-primary px-2 py-0.5 rounded font-bold">RANK #07/50</span>
+            </div>
+            <div class="text-[28px] font-bold text-white font-mono my-2 leading-none">₹10,84,250.00</div>
+            <div class="flex items-center gap-2 text-[12px] font-mono">
+              <span class="text-tertiary font-bold">+₹18,420.00 (+1.72%)</span>
+              <span class="text-on-surface-variant">Today's P&L</span>
+            </div>
+          </div>
+
+          <div class="terminal-panel p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider">INVESTED CAPITAL</span>
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_balance</span>
+            </div>
+            <div class="text-[24px] font-bold text-white font-mono my-2 leading-none">₹8,50,000.00</div>
+            <div class="flex items-center gap-2 text-[12px] font-mono">
+              <span class="text-tertiary font-bold">+₹84,250.00 (+8.42%)</span>
+              <span class="text-on-surface-variant">Total Return</span>
+            </div>
+          </div>
+
+          <div class="terminal-panel p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider">AVAILABLE CASH</span>
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant">payments</span>
+            </div>
+            <div class="text-[24px] font-bold text-white font-mono my-2 leading-none">₹2,34,250.00</div>
+            <div class="flex items-center gap-2 text-[12px] font-mono">
+              <span class="text-on-surface-variant">21.6% of Portfolio</span>
+              <button onclick="navigateTo('trade')" class="text-primary hover:underline ml-auto font-bold">Trade Now →</button>
+            </div>
+          </div>
+
+          <div class="terminal-panel p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider">SHARPE RATIO & RISK</span>
+              <span class="text-[11px] font-mono text-tertiary bg-tertiary/10 border border-tertiary px-2 py-0.5 rounded font-bold">LOW RISK</span>
+            </div>
+            <div class="text-[24px] font-bold text-white font-mono my-2 leading-none">1.84 <span class="text-[14px] text-on-surface-variant font-normal">/ 0.78 Beta</span></div>
+            <div class="flex items-center gap-2 text-[12px] font-mono">
+              <span class="text-on-surface-variant">Max Drawdown:</span>
+              <span class="text-tertiary font-bold">4.2%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Asset Allocation Progress Breakdown -->
+        <div class="terminal-panel p-4">
+          <div class="flex items-center justify-between mb-2.5">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase tracking-wider font-bold">MULTI-ASSET ALLOCATION</span>
+            <span class="text-[11px] font-mono text-on-surface-variant">10 Active Asset Classes</span>
+          </div>
+          <div class="allocation-bar mb-3">
+            <div class="bg-[#3b82f6]" style="width: 34%;" title="Equities: 34%"></div>
+            <div class="bg-[#eab308]" style="width: 12%;" title="Gold: 12%"></div>
+            <div class="bg-[#8b5cf6]" style="width: 10%;" title="Mutual Funds: 10%"></div>
+            <div class="bg-[#ec4899]" style="width: 8%;" title="Real Estate: 8%"></div>
+            <div class="bg-[#06b6d4]" style="width: 8%;" title="ETFs: 8%"></div>
+            <div class="bg-[#f97316]" style="width: 7%;" title="Crypto: 7%"></div>
+            <div class="bg-[#10b981]" style="width: 6%;" title="Liquid Funds: 6%"></div>
+            <div class="bg-[#64748b]" style="width: 5%;" title="Fixed Deposits: 5%"></div>
+            <div class="bg-[#94a3b8]" style="width: 5%;" title="Silver: 5%"></div>
+            <div class="bg-primary" style="width: 5%;" title="Cash: 5%"></div>
+          </div>
+          <div class="flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-mono">
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#3b82f6]"></div><span class="text-on-surface-variant">Equities (34%)</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#eab308]"></div><span class="text-on-surface-variant">Gold (12%)</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#8b5cf6]"></div><span class="text-on-surface-variant">Mutual Funds (10%)</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#ec4899]"></div><span class="text-on-surface-variant">Real Estate (8%)</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#06b6d4]"></div><span class="text-on-surface-variant">ETFs (8%)</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#f97316]"></div><span class="text-on-surface-variant">Crypto (7%)</span></div>
+            <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-primary"></div><span class="text-on-surface-variant">Cash (5%)</span></div>
+            <button onclick="navigateTo('portfolio')" class="text-primary hover:underline font-bold">+3 More Assets</button>
+          </div>
+        </div>
+
+        <!-- Main Chart & Terminal Wire 2-Column Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-3">
+          
+          <!-- Left 8-Cols: Performance Curve & Holdings -->
+          <div class="xl:col-span-8 flex flex-col gap-3">
+            
+            <!-- Performance SVG Chart Card -->
+            <div class="terminal-panel flex flex-col min-h-[300px]">
+              <div class="panel-header">
+                <div class="flex items-center gap-4">
+                  <span class="text-white font-bold text-[13px]">PORTFOLIO CUMULATIVE RETURN</span>
+                  <span class="font-mono text-[13px] text-tertiary font-bold">+8.42% (₹84,250)</span>
+                </div>
+                <div class="flex gap-1.5 font-mono text-[11px]">
+                  <button class="px-2 py-0.5 bg-[#1b2028] text-white rounded border border-outline">1D</button>
+                  <button class="px-2 py-0.5 text-on-surface-variant hover:text-white rounded">1W</button>
+                  <button class="px-2 py-0.5 text-on-surface-variant hover:text-white rounded">1M</button>
+                  <button class="px-2 py-0.5 text-on-surface-variant hover:text-white rounded">ALL</button>
+                </div>
+              </div>
+              
+              <div class="flex-1 relative bg-[#060708] p-4 min-h-[220px] flex items-center justify-center">
+                <svg class="w-full h-48" preserveAspectRatio="none" viewBox="0 0 100 50">
+                  <defs>
+                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Grid -->
+                  <line x1="0" y1="10" x2="100" y2="10" stroke="#21262d" stroke-dasharray="2 2" stroke-width="0.5"/>
+                  <line x1="0" y1="25" x2="100" y2="25" stroke="#21262d" stroke-dasharray="2 2" stroke-width="0.5"/>
+                  <line x1="0" y1="40" x2="100" y2="40" stroke="#21262d" stroke-dasharray="2 2" stroke-width="0.5"/>
+                  <!-- Area -->
+                  <path d="M0,45 Q15,40 30,32 T60,20 T80,15 T100,8 L100,50 L0,50 Z" fill="url(#chartGrad)"/>
+                  <!-- Line -->
+                  <path d="M0,45 Q15,40 30,32 T60,20 T80,15 T100,8" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                </svg>
+                <div class="absolute bottom-2 left-4 right-4 flex justify-between text-[10px] font-mono text-on-surface-variant">
+                  <span>Day 01 (Oct 01)</span>
+                  <span>Day 02</span>
+                  <span>Day 03</span>
+                  <span>Day 04 (Current)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Holdings Overview Table -->
+            <div class="terminal-panel flex flex-col">
+              <div class="panel-header">
+                <span>ACTIVE HOLDINGS LEDGER</span>
+                <div class="flex items-center gap-3 font-mono text-[11px]">
+                  <a href="#portfolio" onclick="navigateTo('portfolio')" class="text-primary hover:underline font-bold">Full Analytics →</a>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+                  <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                    <tr>
+                      <th class="py-2.5 px-4">ASSET</th>
+                      <th class="py-2.5 px-4">TYPE</th>
+                      <th class="py-2.5 px-4 text-right">QUANTITY</th>
+                      <th class="py-2.5 px-4 text-right">AVG BUY</th>
+                      <th class="py-2.5 px-4 text-right">LTP (₹)</th>
+                      <th class="py-2.5 px-4 text-right">P&L (₹)</th>
+                      <th class="py-2.5 px-4 text-right">RETURN</th>
+                      <th class="py-2.5 px-4 text-center">ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-outline">
+                    <tr class="hover:bg-[#15181e] transition-colors">
+                      <td class="py-2.5 px-4 font-bold text-white">RELIANCE</td>
+                      <td class="py-2.5 px-4 text-on-surface-variant text-[11px]">Equity</td>
+                      <td class="py-2.5 px-4 text-right">100</td>
+                      <td class="py-2.5 px-4 text-right text-on-surface-variant">2,850.00</td>
+                      <td class="py-2.5 px-4 text-right font-bold text-white">2,945.60</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+9,560.00</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+3.35%</td>
+                      <td class="py-2.5 px-4 text-center">
+                        <button onclick="navigateTo('trade')" class="px-2 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary rounded text-[11px] font-bold">TRADE</button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#15181e] transition-colors">
+                      <td class="py-2.5 px-4 font-bold text-white">TCS</td>
+                      <td class="py-2.5 px-4 text-on-surface-variant text-[11px]">Equity</td>
+                      <td class="py-2.5 px-4 text-right">50</td>
+                      <td class="py-2.5 px-4 text-right text-on-surface-variant">3,920.00</td>
+                      <td class="py-2.5 px-4 text-right font-bold text-white">4,012.25</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+4,612.50</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+2.35%</td>
+                      <td class="py-2.5 px-4 text-center">
+                        <button onclick="navigateTo('trade')" class="px-2 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary rounded text-[11px] font-bold">TRADE</button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#15181e] transition-colors">
+                      <td class="py-2.5 px-4 font-bold text-white">GOLD 24K</td>
+                      <td class="py-2.5 px-4 text-on-surface-variant text-[11px]">Commodity</td>
+                      <td class="py-2.5 px-4 text-right">20g</td>
+                      <td class="py-2.5 px-4 text-right text-on-surface-variant">69,500.00</td>
+                      <td class="py-2.5 px-4 text-right font-bold text-white">71,850.00</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+4,700.00</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+3.38%</td>
+                      <td class="py-2.5 px-4 text-center">
+                        <button onclick="navigateTo('trade')" class="px-2 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary rounded text-[11px] font-bold">TRADE</button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#15181e] transition-colors">
+                      <td class="py-2.5 px-4 font-bold text-white">BTC/USD</td>
+                      <td class="py-2.5 px-4 text-on-surface-variant text-[11px]">Crypto</td>
+                      <td class="py-2.5 px-4 text-right">0.15</td>
+                      <td class="py-2.5 px-4 text-right text-on-surface-variant">61,000.00</td>
+                      <td class="py-2.5 px-4 text-right font-bold text-white">64,231.00</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+484.65</td>
+                      <td class="py-2.5 px-4 text-right text-tertiary font-bold">+5.29%</td>
+                      <td class="py-2.5 px-4 text-center">
+                        <button onclick="navigateTo('trade')" class="px-2 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary rounded text-[11px] font-bold">TRADE</button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#15181e] transition-colors">
+                      <td class="py-2.5 px-4 font-bold text-white">MUMBAI METRO</td>
+                      <td class="py-2.5 px-4 text-on-surface-variant text-[11px]">Real Estate</td>
+                      <td class="py-2.5 px-4 text-right">1 Unit</td>
+                      <td class="py-2.5 px-4 text-right text-on-surface-variant">1,50,000.00</td>
+                      <td class="py-2.5 px-4 text-right font-bold text-white">1,48,000.00</td>
+                      <td class="py-2.5 px-4 text-right text-error font-bold">-2,000.00</td>
+                      <td class="py-2.5 px-4 text-right text-error font-bold">-1.33%</td>
+                      <td class="py-2.5 px-4 text-center">
+                        <button onclick="navigateTo('trade')" class="px-2 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary rounded text-[11px] font-bold">TRADE</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right 4-Cols: Market Overview & Terminal Wire -->
+          <div class="xl:col-span-4 flex flex-col gap-3">
+            
+            <!-- Asset Class Performance Overview -->
+            <div class="terminal-panel flex flex-col">
+              <div class="panel-header">
+                <span>SECTOR & ASSET MOVERS</span>
+                <span class="text-tertiary font-mono text-[11px] font-bold">24H SYNC</span>
+              </div>
+              <div class="p-3 flex flex-col gap-2 font-mono text-[12px]">
+                <div class="flex items-center justify-between py-1.5 border-b border-outline">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#3b82f6]"></span>
+                    <span class="text-white font-bold">Equities (Nifty/Sensex)</span>
+                  </div>
+                  <span class="text-tertiary font-bold">+1.42%</span>
+                </div>
+                <div class="flex items-center justify-between py-1.5 border-b border-outline">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#eab308]"></span>
+                    <span class="text-white font-bold">Precious Metals (Gold/Silver)</span>
+                  </div>
+                  <span class="text-tertiary font-bold">+0.64%</span>
+                </div>
+                <div class="flex items-center justify-between py-1.5 border-b border-outline">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#f97316]"></span>
+                    <span class="text-white font-bold">Crypto Assets (BTC/ETH)</span>
+                  </div>
+                  <span class="text-tertiary font-bold">+2.85%</span>
+                </div>
+                <div class="flex items-center justify-between py-1.5 border-b border-outline">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#ec4899]"></span>
+                    <span class="text-white font-bold">Commercial Real Estate</span>
+                  </div>
+                  <span class="text-error font-bold">-0.25%</span>
+                </div>
+                <div class="flex items-center justify-between py-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                    <span class="text-white font-bold">Government Sovereign Bonds</span>
+                  </div>
+                  <span class="text-tertiary font-bold">+0.10%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terminal Live Wire Feed -->
+            <div class="terminal-panel flex flex-col flex-1">
+              <div class="panel-header">
+                <span>TERMINAL WIRE FEED</span>
+                <div class="flex items-center gap-1.5 text-tertiary font-mono text-[10px] font-bold">
+                  <span class="status-beacon bg-tertiary"></span> LIVE
+                </div>
+              </div>
+              <div class="p-3 flex flex-col gap-3 overflow-y-auto max-h-[360px]">
+                
+                <div class="pb-2.5 border-b border-outline">
+                  <div class="flex items-center gap-2 text-[10px] font-mono mb-1">
+                    <span class="text-primary font-bold">12:45:02</span>
+                    <span class="bg-[#15181e] text-on-surface-variant px-1.5 py-0.2 rounded border border-outline">RELIANCE</span>
+                  </div>
+                  <div class="text-[12px] text-white hover:text-primary cursor-pointer leading-snug">
+                    Reliance announces ₹50,000 Cr investment in green energy mega-complex.
+                  </div>
+                </div>
+
+                <div class="pb-2.5 border-b border-outline">
+                  <div class="flex items-center gap-2 text-[10px] font-mono mb-1">
+                    <span class="text-on-surface-variant">12:30:15</span>
+                    <span class="bg-[#15181e] text-on-surface-variant px-1.5 py-0.2 rounded border border-outline">MACRO</span>
+                  </div>
+                  <div class="text-[12px] text-white hover:text-primary cursor-pointer leading-snug">
+                    RBI maintains repo rate at 6.5%, signals continued focus on inflation containment.
+                  </div>
+                </div>
+
+                <div class="pb-2.5 border-b border-outline">
+                  <div class="flex items-center gap-2 text-[10px] font-mono mb-1">
+                    <span class="text-error font-bold">12:15:44</span>
+                    <span class="bg-[#15181e] text-on-surface-variant px-1.5 py-0.2 rounded border border-outline">REAL ESTATE</span>
+                  </div>
+                  <div class="text-[12px] text-white hover:text-primary cursor-pointer leading-snug">
+                    Commercial registrations dip 1.2% MoM amid elevated interest rate environment.
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-2 text-[10px] font-mono mb-1">
+                    <span class="text-tertiary font-bold">11:55:00</span>
+                    <span class="bg-[#15181e] text-on-surface-variant px-1.5 py-0.2 rounded border border-outline">CRYPTO</span>
+                  </div>
+                  <div class="text-[12px] text-white hover:text-primary cursor-pointer leading-snug">
+                    Bitcoin crosses $64,000 as institutional ETF inflows hit quarterly record.
+                  </div>
+                </div>
+
+              </div>
+              <div class="p-2 border-t border-outline bg-[#060708] text-center">
+                <a href="#news" onclick="navigateTo('news')" class="text-[11px] font-mono text-primary hover:underline font-bold">Open Institutional Wire Full View →</a>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 2: MARKETS                                                -->
+      <!-- ============================================================== -->
+      <section id="view-markets" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="terminal-panel flex flex-col flex-1">
+          <!-- Markets Sub-Nav & Category Filter -->
+          <div class="panel-header flex-wrap h-auto py-2 gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-white font-bold text-[13px] mr-2">GLOBAL MARKETS DIRECTORY</span>
+              <div class="flex gap-1 font-mono text-[11px]">
+                <button class="px-2.5 py-1 bg-primary text-black font-bold rounded">ALL ASSETS</button>
+                <button class="px-2.5 py-1 text-on-surface-variant hover:text-white bg-[#15181e] rounded">EQUITIES</button>
+                <button class="px-2.5 py-1 text-on-surface-variant hover:text-white bg-[#15181e] rounded">COMMODITIES</button>
+                <button class="px-2.5 py-1 text-on-surface-variant hover:text-white bg-[#15181e] rounded">CRYPTO</button>
+                <button class="px-2.5 py-1 text-on-surface-variant hover:text-white bg-[#15181e] rounded">REAL ESTATE</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[11px] font-mono text-on-surface-variant">Real-Time Data Feed: <strong class="text-tertiary">NSE / BSE / CME</strong></span>
+            </div>
+          </div>
+
+          <!-- Market Table -->
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+              <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                <tr>
+                  <th class="py-3 px-4">TICKER</th>
+                  <th class="py-3 px-4">NAME</th>
+                  <th class="py-3 px-4">CATEGORY</th>
+                  <th class="py-3 px-4 text-right">LAST PRICE (₹)</th>
+                  <th class="py-3 px-4 text-right">24H CHANGE</th>
+                  <th class="py-3 px-4 text-right">24H HIGH</th>
+                  <th class="py-3 px-4 text-right">24H LOW</th>
+                  <th class="py-3 px-4 text-right">VOLUME</th>
+                  <th class="py-3 px-4 text-center">TRADE</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline">
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">NIFTY 50</td>
+                  <td class="py-3 px-4 text-white">NSE Nifty 50 Index</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#3b82f6]/20 text-[#3b82f6] rounded text-[10px] font-bold">Indices</span></td>
+                  <td data-ticker="NIFTY 50" class="py-3 px-4 text-right font-bold text-white">22,514.65</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+0.45%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">22,590.20</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">22,450.10</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">14.2M</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='NIFTY 50'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">SENSEX</td>
+                  <td class="py-3 px-4 text-white">BSE Sensex Index</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#3b82f6]/20 text-[#3b82f6] rounded text-[10px] font-bold">Indices</span></td>
+                  <td data-ticker="SENSEX" class="py-3 px-4 text-right font-bold text-white">74,221.05</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+0.38%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">74,450.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">73,980.50</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">8.6M</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='SENSEX'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">GOLD 24K</td>
+                  <td class="py-3 px-4 text-white">Spot Physical Gold 10g</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#eab308]/20 text-[#eab308] rounded text-[10px] font-bold">Commodities</span></td>
+                  <td data-ticker="GOLD" class="py-3 px-4 text-right font-bold text-white">71,850.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+1.10%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">72,100.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">71,300.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">42.5K</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='GOLD'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">BTC/USD</td>
+                  <td class="py-3 px-4 text-white">Bitcoin Perpetual Swap</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#f97316]/20 text-[#f97316] rounded text-[10px] font-bold">Crypto</span></td>
+                  <td data-ticker="BTC/USD" class="py-3 px-4 text-right font-bold text-white">64,231.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+1.20%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">65,100.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">63,400.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">$18.4B</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='BTC/USD'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">RELIANCE</td>
+                  <td class="py-3 px-4 text-white">Reliance Industries Limited</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#3b82f6]/20 text-[#3b82f6] rounded text-[10px] font-bold">Equities</span></td>
+                  <td data-ticker="RELIANCE" class="py-3 px-4 text-right font-bold text-white">2,945.60</td>
+                  <td class="py-3 px-4 text-right text-error font-bold">-0.42%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">2,980.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">2,930.10</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">3.4M</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='RELIANCE'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">TCS</td>
+                  <td class="py-3 px-4 text-white">Tata Consultancy Services</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#3b82f6]/20 text-[#3b82f6] rounded text-[10px] font-bold">Equities</span></td>
+                  <td data-ticker="TCS" class="py-3 px-4 text-right font-bold text-white">4,012.25</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+1.15%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">4,050.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">3,980.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">1.8M</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='TCS'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">MUMBAI METRO</td>
+                  <td class="py-3 px-4 text-white">Bandra Kurla Complex Commercial REIT</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#ec4899]/20 text-[#ec4899] rounded text-[10px] font-bold">Real Estate</span></td>
+                  <td data-ticker="MUMBAI METRO" class="py-3 px-4 text-right font-bold text-white">148,000.00</td>
+                  <td class="py-3 px-4 text-right text-error font-bold">-1.33%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">151,000.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">147,500.00</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">320</td>
+                  <td class="py-3 px-4 text-center"><button onclick="APP_STATE.selectedTicker='MUMBAI METRO'; navigateTo('trade')" class="px-3 py-1 bg-primary text-black font-bold rounded text-[11px] hover:bg-white transition-colors">EXECUTE</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 3: TRADE TERMINAL                                         -->
+      <!-- ============================================================== -->
+      <section id="view-trade" class="spa-view flex-1 flex-col h-full overflow-hidden p-2 gap-2 bg-background font-sans">
+        
+        <!-- Trade Page Top Bar -->
+        <div class="terminal-panel px-3 py-2 flex items-center justify-between font-mono shrink-0">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span class="text-white font-extrabold text-[15px]">NIFTY 50</span>
+              <span class="text-[11px] text-on-surface-variant">INDEX SPOT</span>
+            </div>
+            <span class="text-primary font-bold text-[18px]">22,514.65</span>
+            <span class="text-tertiary font-bold text-[12px]">+101.40 (+0.45%)</span>
+            <div class="h-4 w-px bg-outline mx-2"></div>
+            <div class="text-[11px] text-on-surface-variant flex gap-4">
+              <span>24H HIGH: <strong class="text-white">22,590.20</strong></span>
+              <span>24H LOW: <strong class="text-white">22,450.10</strong></span>
+              <span>VOLUME: <strong class="text-white">14.2M</strong></span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] text-on-surface-variant">ORDER ROUTING: <strong class="text-tertiary">DIRECT DMA (12ms)</strong></span>
+          </div>
+        </div>
+
+        <!-- 3-Column Trading Workspace -->
+        <div class="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-2 overflow-hidden min-h-0">
+          
+          <!-- Left Column: Interactive Candlestick Chart (7 Cols) -->
+          <div class="xl:col-span-7 flex flex-col terminal-panel overflow-hidden">
+            <div class="panel-header">
+              <div class="flex items-center gap-3">
+                <span class="text-white font-bold text-[12px]">CANDLESTICK CHART (EMA 20 OVERLAY)</span>
+              </div>
+              <div class="flex items-center gap-1 font-mono text-[11px]">
+                <button onclick="if(APP_STATE.candlestickChartInstance) APP_STATE.candlestickChartInstance.setTimeframe('1m')" class="px-2 py-0.5 hover:bg-[#1b2028] text-on-surface-variant hover:text-white rounded">1m</button>
+                <button onclick="if(APP_STATE.candlestickChartInstance) APP_STATE.candlestickChartInstance.setTimeframe('5m')" class="px-2 py-0.5 bg-primary text-black font-bold rounded">5m</button>
+                <button onclick="if(APP_STATE.candlestickChartInstance) APP_STATE.candlestickChartInstance.setTimeframe('15m')" class="px-2 py-0.5 hover:bg-[#1b2028] text-on-surface-variant hover:text-white rounded">15m</button>
+                <button onclick="if(APP_STATE.candlestickChartInstance) APP_STATE.candlestickChartInstance.setTimeframe('1h')" class="px-2 py-0.5 hover:bg-[#1b2028] text-on-surface-variant hover:text-white rounded">1h</button>
+                <button onclick="if(APP_STATE.candlestickChartInstance) APP_STATE.candlestickChartInstance.setTimeframe('1D')" class="px-2 py-0.5 hover:bg-[#1b2028] text-on-surface-variant hover:text-white rounded">1D</button>
+              </div>
+            </div>
+            
+            <div class="flex-1 relative bg-[#060708] overflow-hidden">
+              <canvas id="trade-candlestick-canvas" class="w-full h-full block"></canvas>
+            </div>
+
+            <!-- Open Positions Ledger below Chart -->
+            <div class="h-40 border-t border-outline flex flex-col bg-surface overflow-hidden">
+              <div class="panel-header h-7 text-[10px]">
+                <span>OPEN POSITIONS & RISK LEDGER</span>
+                <span class="text-tertiary font-mono font-bold">TOTAL UNREALIZED P&L: +₹18,420.00</span>
+              </div>
+              <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left font-mono text-[11px] whitespace-nowrap">
+                  <thead class="bg-[#15181e] text-[10px] text-on-surface-variant border-b border-outline">
+                    <tr>
+                      <th class="py-1.5 px-3">SYMBOL</th>
+                      <th class="py-1.5 px-3">SIDE</th>
+                      <th class="py-1.5 px-3 text-right">SIZE</th>
+                      <th class="py-1.5 px-3 text-right">ENTRY</th>
+                      <th class="py-1.5 px-3 text-right">MARK</th>
+                      <th class="py-1.5 px-3 text-right">UNREALIZED P&L</th>
+                      <th class="py-1.5 px-3 text-center">ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-outline">
+                    <tr class="hover:bg-[#15181e]">
+                      <td class="py-1.5 px-3 font-bold text-white">RELIANCE</td>
+                      <td class="py-1.5 px-3 text-tertiary font-bold">LONG</td>
+                      <td class="py-1.5 px-3 text-right">100</td>
+                      <td class="py-1.5 px-3 text-right text-on-surface-variant">2,850.00</td>
+                      <td class="py-1.5 px-3 text-right font-bold text-white">2,945.60</td>
+                      <td class="py-1.5 px-3 text-right text-tertiary font-bold">+₹9,560.00 (+3.35%)</td>
+                      <td class="py-1.5 px-3 text-center"><button onclick="executeOrder('SELL', 'RELIANCE', 100, 2945.60)" class="px-2 py-0.5 bg-[#ff3d57]/20 hover:bg-[#ff3d57]/40 text-[#ff3d57] rounded text-[10px] font-bold">CLOSE</button></td>
+                    </tr>
+                    <tr class="hover:bg-[#15181e]">
+                      <td class="py-1.5 px-3 font-bold text-white">BTC/USD</td>
+                      <td class="py-1.5 px-3 text-tertiary font-bold">LONG</td>
+                      <td class="py-1.5 px-3 text-right">0.15</td>
+                      <td class="py-1.5 px-3 text-right text-on-surface-variant">61,000.00</td>
+                      <td class="py-1.5 px-3 text-right font-bold text-white">64,231.00</td>
+                      <td class="py-1.5 px-3 text-right text-tertiary font-bold">+₹484.65 (+5.29%)</td>
+                      <td class="py-1.5 px-3 text-center"><button onclick="executeOrder('SELL', 'BTC/USD', 0.15, 64231.00)" class="px-2 py-0.5 bg-[#ff3d57]/20 hover:bg-[#ff3d57]/40 text-[#ff3d57] rounded text-[10px] font-bold">CLOSE</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle Column: Live Order Book (2.5 Cols) -->
+          <div class="xl:col-span-2 flex flex-col terminal-panel overflow-hidden font-mono text-[11px]">
+            <div class="panel-header">
+              <span>ORDER BOOK</span>
+              <span class="text-[10px] text-on-surface-variant">0.05 SPREAD</span>
+            </div>
+            
+            <div class="p-2 border-b border-outline flex justify-between text-[10px] text-on-surface-variant">
+              <span>PRICE (₹)</span>
+              <span>SIZE</span>
+              <span>SUM</span>
+            </div>
+
+            <!-- Asks (Red) -->
+            <div class="flex-1 flex flex-col justify-end overflow-hidden p-1 space-y-0.5">
+              <div class="live-ask-row relative flex justify-between items-center px-1.5 py-0.5 text-error">
+                <div class="bid-bar depth-bar-ask absolute inset-0 right-0 pointer-events-none" style="width: 75%;"></div>
+                <span class="ask-price z-10 font-bold">22518.50</span>
+                <span class="ask-qty z-10 text-on-surface-variant">320</span>
+                <span class="z-10 text-on-surface-variant">1,480</span>
+              </div>
+              <div class="live-ask-row relative flex justify-between items-center px-1.5 py-0.5 text-error">
+                <div class="bid-bar depth-bar-ask absolute inset-0 right-0 pointer-events-none" style="width: 50%;"></div>
+                <span class="ask-price z-10 font-bold">22517.20</span>
+                <span class="ask-qty z-10 text-on-surface-variant">210</span>
+                <span class="z-10 text-on-surface-variant">1,160</span>
+              </div>
+              <div class="live-ask-row relative flex justify-between items-center px-1.5 py-0.5 text-error">
+                <div class="bid-bar depth-bar-ask absolute inset-0 right-0 pointer-events-none" style="width: 30%;"></div>
+                <span class="ask-price z-10 font-bold">22515.80</span>
+                <span class="ask-qty z-10 text-on-surface-variant">140</span>
+                <span class="z-10 text-on-surface-variant">950</span>
+              </div>
+            </div>
+
+            <!-- Current Mid Price -->
+            <div class="py-1.5 px-3 bg-[#15181e] border-y border-outline flex justify-between items-center">
+              <span class="text-tertiary font-bold text-[13px]">22,514.65 ↑</span>
+              <span class="text-[10px] text-on-surface-variant">₹0.50</span>
+            </div>
+
+            <!-- Bids (Green) -->
+            <div class="flex-1 flex flex-col justify-start overflow-hidden p-1 space-y-0.5">
+              <div class="live-bid-row relative flex justify-between items-center px-1.5 py-0.5 text-tertiary">
+                <div class="bid-bar depth-bar-bid absolute inset-0 left-0 pointer-events-none" style="width: 40%;"></div>
+                <span class="bid-price z-10 font-bold">22514.15</span>
+                <span class="bid-qty z-10 text-on-surface-variant">180</span>
+                <span class="z-10 text-on-surface-variant">180</span>
+              </div>
+              <div class="live-bid-row relative flex justify-between items-center px-1.5 py-0.5 text-tertiary">
+                <div class="bid-bar depth-bar-bid absolute inset-0 left-0 pointer-events-none" style="width: 65%;"></div>
+                <span class="bid-price z-10 font-bold">22513.00</span>
+                <span class="bid-qty z-10 text-on-surface-variant">290</span>
+                <span class="z-10 text-on-surface-variant">470</span>
+              </div>
+              <div class="live-bid-row relative flex justify-between items-center px-1.5 py-0.5 text-tertiary">
+                <div class="bid-bar depth-bar-bid absolute inset-0 left-0 pointer-events-none" style="width: 85%;"></div>
+                <span class="bid-price z-10 font-bold">22511.50</span>
+                <span class="bid-qty z-10 text-on-surface-variant">380</span>
+                <span class="z-10 text-on-surface-variant">850</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Order Entry Panel (2.5 Cols) -->
+          <div class="xl:col-span-3 flex flex-col terminal-panel p-3 font-mono text-[12px] justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-outline pb-2 mb-3">
+                <span class="text-white font-bold text-[13px]">ORDER ENTRY</span>
+                <span class="text-[11px] text-tertiary font-bold">DMA ACTIVE</span>
+              </div>
+
+              <!-- Order Type Tabs -->
+              <div class="grid grid-cols-2 gap-1 bg-[#060708] p-1 rounded border border-outline mb-3">
+                <button id="order-type-market" class="py-1 bg-primary text-black font-bold rounded text-[11px]">MARKET</button>
+                <button id="order-type-limit" class="py-1 text-on-surface-variant hover:text-white rounded text-[11px]">LIMIT</button>
+              </div>
+
+              <!-- Symbol Selector -->
+              <div class="mb-3">
+                <label class="text-[10px] text-on-surface-variant uppercase tracking-wider block mb-1">Select Ticker</label>
+                <select id="trade-order-symbol" class="w-full bg-[#060708] border border-outline rounded px-2.5 py-1.5 text-white font-mono text-[12px] focus:border-primary outline-none">
+                  <option value="NIFTY 50">NIFTY 50 (₹22,514.65)</option>
+                  <option value="RELIANCE">RELIANCE (₹2,945.60)</option>
+                  <option value="TCS">TCS (₹4,012.25)</option>
+                  <option value="GOLD">GOLD 24K (₹71,850.00)</option>
+                  <option value="BTC/USD">BTC/USD (₹64,231.00)</option>
+                </select>
+              </div>
+
+              <!-- Quantity Input -->
+              <div class="mb-3">
+                <div class="flex justify-between text-[10px] text-on-surface-variant uppercase mb-1">
+                  <span>Order Quantity</span>
+                  <span>Max: 100</span>
+                </div>
+                <input id="trade-order-qty" type="number" value="10" min="1" max="1000" class="w-full bg-[#060708] border border-outline rounded px-2.5 py-1.5 text-white font-mono text-[12px] focus:border-primary outline-none"/>
+              </div>
+
+              <!-- Quick Percent Sliders -->
+              <div class="grid grid-cols-4 gap-1 mb-3">
+                <button onclick="document.getElementById('trade-order-qty').value='10'" class="py-1 bg-[#15181e] hover:bg-[#21262d] text-on-surface-variant text-[10px] rounded border border-outline">25%</button>
+                <button onclick="document.getElementById('trade-order-qty').value='25'" class="py-1 bg-[#15181e] hover:bg-[#21262d] text-on-surface-variant text-[10px] rounded border border-outline">50%</button>
+                <button onclick="document.getElementById('trade-order-qty').value='50'" class="py-1 bg-[#15181e] hover:bg-[#21262d] text-on-surface-variant text-[10px] rounded border border-outline">75%</button>
+                <button onclick="document.getElementById('trade-order-qty').value='100'" class="py-1 bg-[#15181e] hover:bg-[#21262d] text-on-surface-variant text-[10px] rounded border border-outline">100%</button>
+              </div>
+
+              <!-- Execution Summary Cost -->
+              <div class="bg-[#060708] p-2.5 rounded border border-outline mb-3 space-y-1 text-[11px]">
+                <div class="flex justify-between text-on-surface-variant">
+                  <span>Available Cash:</span>
+                  <span class="text-white font-bold">₹2,34,250.00</span>
+                </div>
+                <div class="flex justify-between text-on-surface-variant">
+                  <span>Est. Execution Fee:</span>
+                  <span class="text-white">₹20.00</span>
+                </div>
+                <div class="flex justify-between text-on-surface-variant">
+                  <span>Slippage Model:</span>
+                  <span class="text-tertiary">0.01% DMA</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buy & Sell Action Buttons -->
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="
+                const sym = document.getElementById('trade-order-symbol').value;
+                const qty = document.getElementById('trade-order-qty').value;
+                const t = APP_STATE.tickers.find(x => x.symbol === sym) || APP_STATE.tickers[0];
+                executeOrder('BUY', sym, qty, t.price);
+              " class="py-2.5 bg-tertiary hover:bg-[#00c853] text-black font-extrabold rounded text-[13px] transition-colors flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[18px]">trending_up</span>
+                BUY / LONG
+              </button>
+
+              <button onclick="
+                const sym = document.getElementById('trade-order-symbol').value;
+                const qty = document.getElementById('trade-order-qty').value;
+                const t = APP_STATE.tickers.find(x => x.symbol === sym) || APP_STATE.tickers[0];
+                executeOrder('SELL', sym, qty, t.price);
+              " class="py-2.5 bg-[#ff3d57] hover:bg-[#d50000] text-white font-extrabold rounded text-[13px] transition-colors flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[18px]">trending_down</span>
+                SELL / SHORT
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 4: WATCHLIST                                              -->
+      <!-- ============================================================== -->
+      <section id="view-watchlist" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        <div class="terminal-panel flex flex-col flex-1">
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="text-white font-bold text-[13px]">CUSTOM ASSET WATCHLIST</span>
+              <span class="text-[11px] font-mono text-tertiary font-bold">12 ASSETS TRACKED</span>
+            </div>
+            <button onclick="showToast('Ticker added to your active watchlist.', 'success')" class="px-2.5 py-1 bg-primary text-black font-mono font-bold rounded text-[11px] hover:bg-white transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">add</span> ADD SYMBOL
+            </button>
+          </div>
+
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+              <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                <tr>
+                  <th class="py-3 px-4">SYMBOL</th>
+                  <th class="py-3 px-4">NAME</th>
+                  <th class="py-3 px-4">CATEGORY</th>
+                  <th class="py-3 px-4 text-right">LAST PRICE</th>
+                  <th class="py-3 px-4 text-right">24H CHANGE</th>
+                  <th class="py-3 px-4 text-right">52W HIGH / LOW</th>
+                  <th class="py-3 px-4 text-right">VOLUME</th>
+                  <th class="py-3 px-4 text-center">ACTION</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline">
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">NIFTY 50</td>
+                  <td class="py-3 px-4 text-white">NSE Nifty 50 Benchmark</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Index</td>
+                  <td data-ticker="NIFTY 50" class="py-3 px-4 text-right font-bold text-white">22,514.65</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+0.45%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">22,780 / 18,837</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">14.2M</td>
+                  <td class="py-3 px-4 text-center">
+                    <button onclick="APP_STATE.selectedTicker='NIFTY 50'; navigateTo('trade')" class="px-2.5 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary font-bold rounded text-[11px]">TRADE</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">BTC/USD</td>
+                  <td class="py-3 px-4 text-white">Bitcoin Perpetual Contract</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Crypto</td>
+                  <td data-ticker="BTC/USD" class="py-3 px-4 text-right font-bold text-white">64,231.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+1.20%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">73,750 / 26,000</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">$18.4B</td>
+                  <td class="py-3 px-4 text-center">
+                    <button onclick="APP_STATE.selectedTicker='BTC/USD'; navigateTo('trade')" class="px-2.5 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary font-bold rounded text-[11px]">TRADE</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">RELIANCE</td>
+                  <td class="py-3 px-4 text-white">Reliance Industries Ltd</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Equities</td>
+                  <td data-ticker="RELIANCE" class="py-3 px-4 text-right font-bold text-white">2,945.60</td>
+                  <td class="py-3 px-4 text-right text-error font-bold">-0.42%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">3,024 / 2,220</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">3.4M</td>
+                  <td class="py-3 px-4 text-center">
+                    <button onclick="APP_STATE.selectedTicker='RELIANCE'; navigateTo('trade')" class="px-2.5 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary font-bold rounded text-[11px]">TRADE</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#15181e] transition-colors">
+                  <td class="py-3 px-4 font-bold text-primary">GOLD 24K</td>
+                  <td class="py-3 px-4 text-white">Physical Gold 10 Grams</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Commodity</td>
+                  <td data-ticker="GOLD" class="py-3 px-4 text-right font-bold text-white">71,850.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+1.10%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">74,200 / 58,500</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">42.5K</td>
+                  <td class="py-3 px-4 text-center">
+                    <button onclick="APP_STATE.selectedTicker='GOLD'; navigateTo('trade')" class="px-2.5 py-0.5 bg-primary/20 hover:bg-primary/40 text-primary font-bold rounded text-[11px]">TRADE</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 5: PORTFOLIO                                              -->
+      <!-- ============================================================== -->
+      <section id="view-portfolio" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <!-- Key Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="terminal-panel p-4">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase">TOTAL ASSET VALUE</span>
+            <div class="text-[28px] font-bold text-white font-mono my-1">₹10,84,250.00</div>
+            <span class="text-tertiary font-mono text-[12px] font-bold">+8.42% Total Return</span>
+          </div>
+          <div class="terminal-panel p-4">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase">PORTFOLIO VOLATILITY & BETA</span>
+            <div class="text-[28px] font-bold text-white font-mono my-1">0.78 <span class="text-[14px] text-on-surface-variant">Beta (Low Volatility)</span></div>
+            <span class="text-tertiary font-mono text-[12px] font-bold">Sharpe: 1.84</span>
+          </div>
+          <div class="terminal-panel p-4">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase">AVAILABLE LIQUIDITY</span>
+            <div class="text-[28px] font-bold text-white font-mono my-1">₹2,34,250.00</div>
+            <span class="text-on-surface-variant font-mono text-[12px]">21.6% Ready for allocation</span>
+          </div>
+        </div>
+
+        <!-- Full Detailed Holdings Table -->
+        <div class="terminal-panel flex flex-col flex-1">
+          <div class="panel-header">
+            <span>DETAILED PORTFOLIO HOLDINGS & RISK PROFILE</span>
+            <button onclick="navigateTo('trade')" class="text-primary font-mono text-[11px] font-bold hover:underline">Rebalance Portfolio →</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+              <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                <tr>
+                  <th class="py-3 px-4">ASSET CLASS</th>
+                  <th class="py-3 px-4">HOLDINGS</th>
+                  <th class="py-3 px-4 text-right">WEIGHT %</th>
+                  <th class="py-3 px-4 text-right">INVESTED VALUE</th>
+                  <th class="py-3 px-4 text-right">CURRENT VALUE</th>
+                  <th class="py-3 px-4 text-right">UNREALIZED P&L</th>
+                  <th class="py-3 px-4 text-right">RETURN %</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline">
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 font-bold text-white">Large-Cap Equities</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Reliance, TCS, HDFC Bank</td>
+                  <td class="py-3 px-4 text-right font-bold">34.0%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">₹3,45,000.00</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹3,68,642.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+₹23,642.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+6.85%</td>
+                </tr>
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 font-bold text-white">Precious Metals</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Gold 24K Physical 20g</td>
+                  <td class="py-3 px-4 text-right font-bold">12.0%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">₹1,39,000.00</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹1,43,700.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+₹4,700.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+3.38%</td>
+                </tr>
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 font-bold text-white">Digital Assets</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Bitcoin Spot 0.15 BTC</td>
+                  <td class="py-3 px-4 text-right font-bold">7.0%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">₹61,000.00</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹64,231.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+₹3,231.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+5.29%</td>
+                </tr>
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 font-bold text-white">Commercial REITs</td>
+                  <td class="py-3 px-4 text-on-surface-variant">Mumbai Metro REIT Unit 1</td>
+                  <td class="py-3 px-4 text-right font-bold">8.0%</td>
+                  <td class="py-3 px-4 text-right text-on-surface-variant">₹1,50,000.00</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹1,48,000.00</td>
+                  <td class="py-3 px-4 text-right text-error font-bold">-₹2,000.00</td>
+                  <td class="py-3 px-4 text-right text-error font-bold">-1.33%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 6: ORDERS                                                 -->
+      <!-- ============================================================== -->
+      <section id="view-orders" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="terminal-panel flex flex-col flex-1">
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="text-white font-bold text-[13px]">LIVE ORDER MANAGEMENT QUEUE</span>
+            </div>
+            <div class="flex gap-1 font-mono text-[11px]">
+              <button class="px-2.5 py-1 bg-primary text-black font-bold rounded">OPEN ORDERS</button>
+              <button class="px-2.5 py-1 bg-[#15181e] text-on-surface-variant hover:text-white rounded">FILLED</button>
+              <button class="px-2.5 py-1 bg-[#15181e] text-on-surface-variant hover:text-white rounded">CANCELLED</button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+              <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                <tr>
+                  <th class="py-3 px-4">ORDER ID</th>
+                  <th class="py-3 px-4">TIMESTAMP</th>
+                  <th class="py-3 px-4">SYMBOL</th>
+                  <th class="py-3 px-4">SIDE</th>
+                  <th class="py-3 px-4">TYPE</th>
+                  <th class="py-3 px-4 text-right">PRICE (₹)</th>
+                  <th class="py-3 px-4 text-right">QTY</th>
+                  <th class="py-3 px-4 text-center">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body" class="divide-y divide-outline">
+                <!-- Dynamically Populated by js/app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 7: TRANSACTIONS                                           -->
+      <!-- ============================================================== -->
+      <section id="view-transactions" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="terminal-panel flex flex-col flex-1">
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="text-white font-bold text-[13px]">TRANSACTION AUDIT LEDGER</span>
+              <span class="text-[11px] font-mono text-tertiary font-bold">AUTHENTICATED LEDGER</span>
+            </div>
+            <button onclick="exportTransactionsCSV()" class="px-3 py-1 bg-primary text-black font-mono font-bold rounded text-[11px] hover:bg-white transition-colors flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">download</span> EXPORT CSV
+            </button>
+          </div>
+
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+              <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                <tr>
+                  <th class="py-3 px-4">TRANSACTION ID</th>
+                  <th class="py-3 px-4">TIME</th>
+                  <th class="py-3 px-4">SYMBOL</th>
+                  <th class="py-3 px-4">SIDE</th>
+                  <th class="py-3 px-4 text-right">PRICE (₹)</th>
+                  <th class="py-3 px-4 text-right">QUANTITY</th>
+                  <th class="py-3 px-4 text-right">TOTAL AMOUNT (₹)</th>
+                  <th class="py-3 px-4 text-right">DMA FEE (₹)</th>
+                  <th class="py-3 px-4 text-center">STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-table-body" class="divide-y divide-outline">
+                <!-- Dynamically Populated by js/app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 8: NEWS & WIRE                                            -->
+      <!-- ============================================================== -->
+      <section id="view-news" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-3">
+          
+          <!-- News Feed List (8 Cols) -->
+          <div class="xl:col-span-8 flex flex-col terminal-panel">
+            <div class="panel-header">
+              <div class="flex items-center gap-2">
+                <span class="text-white font-bold text-[13px]">INSTITUTIONAL REAL-TIME WIRE</span>
+                <span class="status-beacon bg-tertiary ml-2"></span>
+              </div>
+              <div class="flex gap-1 font-mono text-[11px]">
+                <button class="px-2.5 py-0.5 bg-primary text-black font-bold rounded">ALL</button>
+                <button class="px-2.5 py-0.5 bg-[#15181e] text-on-surface-variant hover:text-white rounded">MACRO</button>
+                <button class="px-2.5 py-0.5 bg-[#15181e] text-on-surface-variant hover:text-white rounded">EQUITIES</button>
+                <button class="px-2.5 py-0.5 bg-[#15181e] text-on-surface-variant hover:text-white rounded">CRYPTO</button>
+              </div>
+            </div>
+
+            <div class="p-4 flex flex-col gap-4 divide-y divide-outline">
+              
+              <div class="pt-2 first:pt-0">
+                <div class="flex items-center gap-3 font-mono text-[11px] mb-1.5">
+                  <span class="text-primary font-bold">12:45:02</span>
+                  <span class="px-2 py-0.5 bg-tertiary/20 text-tertiary rounded font-bold">BULLISH</span>
+                  <span class="text-on-surface-variant">REUTERS TERMINAL</span>
+                </div>
+                <h3 class="text-[14px] font-bold text-white hover:text-primary cursor-pointer mb-1">Reliance Industries Announces ₹50,000 Cr Clean Energy Expansion</h3>
+                <p class="text-[13px] text-on-surface-variant leading-relaxed">
+                  The conglomerate disclosed a major acceleration in solar giga-factory production and green hydrogen export contracts across Europe and East Asia.
+                </p>
+              </div>
+
+              <div class="pt-4">
+                <div class="flex items-center gap-3 font-mono text-[11px] mb-1.5">
+                  <span class="text-on-surface-variant">12:30:15</span>
+                  <span class="px-2 py-0.5 bg-[#3b82f6]/20 text-[#3b82f6] rounded font-bold">NEUTRAL</span>
+                  <span class="text-on-surface-variant">BLOOMBERG WIRE</span>
+                </div>
+                <h3 class="text-[14px] font-bold text-white hover:text-primary cursor-pointer mb-1">RBI Monetary Policy: Benchmark Rate Kept Steady at 6.50%</h3>
+                <p class="text-[13px] text-on-surface-variant leading-relaxed">
+                  Governor highlights resilient domestic GDP growth of 7.2% while reiterating the commitment to aligning headline inflation with the 4% median target.
+                </p>
+              </div>
+
+              <div class="pt-4">
+                <div class="flex items-center gap-3 font-mono text-[11px] mb-1.5">
+                  <span class="text-error font-bold">12:15:44</span>
+                  <span class="px-2 py-0.5 bg-error/20 text-error rounded font-bold">BEARISH</span>
+                  <span class="text-on-surface-variant">FINANCIAL CHRONICLE</span>
+                </div>
+                <h3 class="text-[14px] font-bold text-white hover:text-primary cursor-pointer mb-1">Commercial Real Estate Registrations Contract 12% in Mumbai Metropolitan Region</h3>
+                <p class="text-[13px] text-on-surface-variant leading-relaxed">
+                  Higher borrowing costs and delayed enterprise lease renewals lead to a short-term cooling in Grade-A office absorption metrics.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Economic Calendar & Macro Timeline (4 Cols) -->
+          <div class="xl:col-span-4 flex flex-col gap-3">
+            <div class="terminal-panel p-4">
+              <div class="panel-header -mx-4 -mt-4 mb-3">
+                <span>TODAY'S MACRO EVENTS</span>
+                <span class="text-primary font-mono text-[11px]">UTC +05:30</span>
+              </div>
+              <div class="flex flex-col gap-3 font-mono text-[12px]">
+                <div class="flex justify-between items-center py-1.5 border-b border-outline">
+                  <div>
+                    <div class="font-bold text-white">14:00 - US Core CPI Release</div>
+                    <div class="text-[10px] text-on-surface-variant">Exp: 3.2% | Prev: 3.4%</div>
+                  </div>
+                  <span class="text-[#ff9800] font-bold text-[10px] bg-[#ff9800]/20 px-1.5 py-0.5 rounded">HIGH VOL</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5 border-b border-outline">
+                  <div>
+                    <div class="font-bold text-white">16:30 - Crude Oil Inventories</div>
+                    <div class="text-[10px] text-on-surface-variant">Exp: -1.2M bbl</div>
+                  </div>
+                  <span class="text-tertiary font-bold text-[10px] bg-tertiary/20 px-1.5 py-0.5 rounded">MEDIUM</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5">
+                  <div>
+                    <div class="font-bold text-white">18:00 - Federal Reserve Speech</div>
+                    <div class="text-[10px] text-on-surface-variant">Chair Outlook on Rates</div>
+                  </div>
+                  <span class="text-error font-bold text-[10px] bg-error/20 px-1.5 py-0.5 rounded">CRITICAL</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 9: LEADERBOARD                                            -->
+      <!-- ============================================================== -->
+      <section id="view-leaderboard" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="terminal-panel p-4 border-l-4 border-l-[#ff9800]">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase">CURRENT LEADER (RANK #1)</span>
+            <div class="text-[22px] font-bold text-white font-mono my-1">QUANT_NINJA</div>
+            <div class="text-tertiary font-mono text-[13px] font-bold">+28.45% ROI (₹2,84,500 Profit)</div>
+          </div>
+          <div class="terminal-panel p-4 border-l-4 border-l-primary">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase">YOUR STANDING</span>
+            <div class="text-[22px] font-bold text-primary font-mono my-1">RANK #07 / 50</div>
+            <div class="text-tertiary font-mono text-[13px] font-bold">+8.42% ROI (₹84,250 Profit)</div>
+          </div>
+          <div class="terminal-panel p-4 border-l-4 border-l-tertiary">
+            <span class="text-[11px] font-mono text-on-surface-variant uppercase">COMPETITION TIME REMAINING</span>
+            <div class="text-[22px] font-bold text-white font-mono my-1">6 DAYS : 14 HRS</div>
+            <div class="text-on-surface-variant font-mono text-[12px]">Round 1 Ending Soon</div>
+          </div>
+        </div>
+
+        <div class="terminal-panel flex flex-col flex-1">
+          <div class="panel-header">
+            <span>INSTITUTIONAL ARENA LEADERBOARD</span>
+            <span class="text-[11px] font-mono text-primary font-bold">50 QUALIFIED TRADERS</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
+              <thead class="bg-[#15181e] text-[11px] text-on-surface-variant border-b border-outline">
+                <tr>
+                  <th class="py-3 px-4">RANK</th>
+                  <th class="py-3 px-4">TRADER</th>
+                  <th class="py-3 px-4">TIER</th>
+                  <th class="py-3 px-4 text-right">RETURN %</th>
+                  <th class="py-3 px-4 text-right">TOTAL P&L (₹)</th>
+                  <th class="py-3 px-4 text-right">WIN RATE</th>
+                  <th class="py-3 px-4 text-right">TRADES</th>
+                  <th class="py-3 px-4 text-center">BADGE</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline">
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 text-[#ff9800] font-bold">#01</td>
+                  <td class="py-3 px-4 font-bold text-white">QUANT_NINJA</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-[#ff9800]/20 text-[#ff9800] rounded text-[10px] font-bold">Grandmaster</span></td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+28.45%</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹2,84,500.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary">78.5%</td>
+                  <td class="py-3 px-4 text-right">142</td>
+                  <td class="py-3 px-4 text-center">🏆</td>
+                </tr>
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 text-white font-bold">#02</td>
+                  <td class="py-3 px-4 font-bold text-white">ALPHA_HUNTER</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-primary/20 text-primary rounded text-[10px] font-bold">Master</span></td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+22.10%</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹2,21,000.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary">72.0%</td>
+                  <td class="py-3 px-4 text-right">98</td>
+                  <td class="py-3 px-4 text-center">🥈</td>
+                </tr>
+                <tr class="hover:bg-[#15181e]">
+                  <td class="py-3 px-4 text-white font-bold">#03</td>
+                  <td class="py-3 px-4 font-bold text-white">SWAN_TACTICIAN</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-primary/20 text-primary rounded text-[10px] font-bold">Master</span></td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+19.80%</td>
+                  <td class="py-3 px-4 text-right text-white font-bold">₹1,98,000.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary">69.4%</td>
+                  <td class="py-3 px-4 text-right">115</td>
+                  <td class="py-3 px-4 text-center">🥉</td>
+                </tr>
+                <tr class="bg-primary/10 border-2 border-primary">
+                  <td class="py-3 px-4 text-primary font-bold">#07</td>
+                  <td class="py-3 px-4 font-bold text-primary">YOU (QUANT_07)</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 bg-primary/30 text-primary rounded text-[10px] font-bold">Diamond</span></td>
+                  <td class="py-3 px-4 text-right text-tertiary font-bold">+8.42%</td>
+                  <td class="py-3 px-4 text-right text-primary font-bold">₹84,250.00</td>
+                  <td class="py-3 px-4 text-right text-tertiary">66.7%</td>
+                  <td class="py-3 px-4 text-right">38</td>
+                  <td class="py-3 px-4 text-center">⭐</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 10: SIMULATION & EVENT RULES                              -->
+      <!-- ============================================================== -->
+      <section id="view-simulation" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="terminal-panel p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#ff3d57] text-[24px]">crisis_alert</span>
+              <h2 class="text-[16px] font-bold text-white font-mono">BLACK SWAN SCENARIO STRESS TEST ENGINE</h2>
+            </div>
+            <span class="text-tertiary font-mono text-[11px] bg-tertiary/10 border border-tertiary px-2 py-0.5 rounded font-bold">SIMULATION READY</span>
+          </div>
+          <p class="text-[13px] text-on-surface-variant leading-relaxed mb-4 font-sans">
+            Trigger macroeconomic tail-risk events and stress-test your portfolio against extreme market anomalies. Selecting a shock modifies prices, spreads, and liquidity instantly.
+          </p>
+
+          <!-- Shock Buttons Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+            
+            <button onclick="triggerBlackSwanShock('flash_crash')" class="p-3.5 bg-[#060708] hover:bg-[#ff3d57]/20 border border-[#ff3d57] rounded flex flex-col text-left transition-all group">
+              <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-[#ff3d57] font-mono font-bold text-[13px]">⚡ FLASH CRASH</span>
+                <span class="text-[10px] font-mono text-white bg-[#ff3d57] px-1.5 py-0.2 rounded">-18.2%</span>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Rapid algorithmic cascade with liquidity collapse in equities & crypto.</span>
+            </button>
+
+            <button onclick="triggerBlackSwanShock('oil_shock')" class="p-3.5 bg-[#060708] hover:bg-[#ff9800]/20 border border-[#ff9800] rounded flex flex-col text-left transition-all group">
+              <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-[#ff9800] font-mono font-bold text-[13px]">🛢️ OIL EMBARGO</span>
+                <span class="text-[10px] font-mono text-black bg-[#ff9800] px-1.5 py-0.2 rounded font-bold">+25.0%</span>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Strait bottleneck squeezes crude & commodities; inflates transport costs.</span>
+            </button>
+
+            <button onclick="triggerBlackSwanShock('tech_boom')" class="p-3.5 bg-[#060708] hover:bg-tertiary/20 border border-tertiary rounded flex flex-col text-left transition-all group">
+              <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-tertiary font-mono font-bold text-[13px]">🚀 TECH SHORT SQUEEZE</span>
+                <span class="text-[10px] font-mono text-black bg-tertiary px-1.5 py-0.2 rounded font-bold">+15.0%</span>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">AI breakthrough sparks institutional short squeeze across tech leaders.</span>
+            </button>
+
+            <button onclick="triggerBlackSwanShock('reset')" class="p-3.5 bg-[#060708] hover:bg-[#1b2028] border border-outline rounded flex flex-col text-left transition-all group">
+              <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-primary font-mono font-bold text-[13px]">🔄 RESET BASELINE</span>
+                <span class="text-[10px] font-mono text-white bg-[#21262d] px-1.5 py-0.2 rounded">DEFAULT</span>
+              </div>
+              <span class="text-[11px] text-on-surface-variant">Restore normal market regime, baseline quotes, and order book depth.</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Competition Rules Card -->
+        <div class="terminal-panel p-4 font-mono text-[12px]">
+          <div class="panel-header -mx-4 -mt-4 mb-3">
+            <span>OFFICIAL COMPETITION RULEBOOK & PARAMETERS</span>
+          </div>
+          <div class="space-y-3 text-on-surface-variant">
+            <div class="flex items-start gap-2">
+              <span class="text-primary font-bold">01.</span>
+              <span><strong>Initial Capital:</strong> ₹10,00,000 virtual balance allotted per contestant at Round 0.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-primary font-bold">02.</span>
+              <span><strong>Maximum Drawdown:</strong> Contestants breaching -15% peak-to-trough drawdown are subject to mandatory liquidation.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-primary font-bold">03.</span>
+              <span><strong>Asset Diversity:</strong> At least 3 distinct asset classes must be maintained with ≥ 5% weight each.</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 11: SETTINGS                                              -->
+      <!-- ============================================================== -->
+      <section id="view-settings" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-[12px]">
+          
+          <!-- Theme & Display Customization -->
+          <div class="terminal-panel p-4 flex flex-col gap-3">
+            <span class="text-[13px] font-bold text-white uppercase border-b border-outline pb-2">THEME & DISPLAY CUSTOMIZATION</span>
+            
+            <div>
+              <label class="text-[11px] text-on-surface-variant block mb-1">Color Theme</label>
+              <select onchange="document.body.className = 'font-sans h-screen w-screen overflow-hidden flex flex-col selection:bg-primary selection:text-black ' + this.value; showToast('Theme applied: ' + this.value, 'success');" class="w-full bg-[#060708] border border-outline rounded p-2 text-white font-mono text-[12px]">
+                <option value="theme-obsidian">Obsidian Dark (Cyan & Amber Default)</option>
+                <option value="theme-matrix">Matrix Green (Terminal Monospace)</option>
+                <option value="theme-amber">Amber Horizon (Bloomberg Classic)</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between py-2 border-t border-outline">
+              <div>
+                <div class="text-white font-bold">CRT Retro Scanline Overlay</div>
+                <div class="text-[10px] text-on-surface-variant">Adds CRT phosphor scanline simulation</div>
+              </div>
+              <input type="checkbox" onchange="document.body.classList.toggle('enable-crt', this.checked); showToast('CRT Scanline toggle changed', 'info');" class="rounded bg-[#060708] border-outline text-primary focus:ring-0 cursor-pointer"/>
+            </div>
+
+            <div class="flex items-center justify-between py-2 border-t border-outline">
+              <div>
+                <div class="text-white font-bold">Terminal Audio Synthesizer</div>
+                <div class="text-[10px] text-on-surface-variant">Plays order execution and alarm chimes</div>
+              </div>
+              <input type="checkbox" checked onchange="if(window.terminalAudio) window.terminalAudio.muted = !this.checked; showToast('Audio state updated', 'info');" class="rounded bg-[#060708] border-outline text-primary focus:ring-0 cursor-pointer"/>
+            </div>
+          </div>
+
+          <!-- API & Security -->
+          <div class="terminal-panel p-4 flex flex-col gap-3">
+            <span class="text-[13px] font-bold text-white uppercase border-b border-outline pb-2">API GATEWAYS & RISK LIMITS</span>
+            
+            <div>
+              <label class="text-[11px] text-on-surface-variant block mb-1">Direct Market Access API Key</label>
+              <input type="password" value="bs_live_9948271038102938471" readonly class="w-full bg-[#060708] border border-outline rounded p-2 text-on-surface-variant font-mono text-[12px]"/>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-t border-outline">
+              <div>
+                <div class="text-white font-bold">Latency Benchmark</div>
+                <div class="text-[10px] text-on-surface-variant">NSE Gateway DMA ping: 12ms</div>
+              </div>
+              <span class="text-tertiary font-bold">OPTIMAL</span>
+            </div>
+
+            <div class="flex justify-between items-center py-2 border-t border-outline">
+              <div>
+                <div class="text-white font-bold">Two-Factor Authentication</div>
+                <div class="text-[10px] text-on-surface-variant">Hardware Key & TOTP Authenticator</div>
+              </div>
+              <span class="text-tertiary font-bold">ENABLED</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ============================================================== -->
+      <!-- VIEW 12: SUPPORT & LOGS                                        -->
+      <!-- ============================================================== -->
+      <section id="view-support" class="spa-view flex-1 flex-col h-full overflow-y-auto p-3 gap-3 bg-background font-sans">
+        
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-3">
+          
+          <div class="xl:col-span-8 flex flex-col terminal-panel">
+            <div class="panel-header">
+              <span>SYSTEM STATUS & GATEWAY PINGS</span>
+              <span class="text-tertiary font-mono text-[11px] font-bold">ALL SYSTEMS OPERATIONAL</span>
+            </div>
+            
+            <div class="p-4 grid grid-cols-2 md:grid-cols-3 gap-3 font-mono text-[12px]">
+              <div class="bg-[#060708] p-3 rounded border border-outline">
+                <div class="text-[10px] text-on-surface-variant uppercase">NSE FEED GATEWAY</div>
+                <div class="text-white font-bold text-[14px] my-1">12 ms</div>
+                <span class="text-tertiary text-[10px] font-bold">● 100.0% UPTIME</span>
+              </div>
+              <div class="bg-[#060708] p-3 rounded border border-outline">
+                <div class="text-[10px] text-on-surface-variant uppercase">BSE MATCHING ENGINE</div>
+                <div class="text-white font-bold text-[14px] my-1">14 ms</div>
+                <span class="text-tertiary text-[10px] font-bold">● 100.0% UPTIME</span>
+              </div>
+              <div class="bg-[#060708] p-3 rounded border border-outline">
+                <div class="text-[10px] text-on-surface-variant uppercase">MCX COMMODITY FEED</div>
+                <div class="text-white font-bold text-[14px] my-1">19 ms</div>
+                <span class="text-tertiary text-[10px] font-bold">● 99.98% UPTIME</span>
+              </div>
+              <div class="bg-[#060708] p-3 rounded border border-outline">
+                <div class="text-[10px] text-on-surface-variant uppercase">BINANCE DERIVATIVES</div>
+                <div class="text-white font-bold text-[14px] my-1">45 ms</div>
+                <span class="text-tertiary text-[10px] font-bold">● 99.99% UPTIME</span>
+              </div>
+              <div class="bg-[#060708] p-3 rounded border border-outline">
+                <div class="text-[10px] text-on-surface-variant uppercase">CME GLOBEX CHICAGO</div>
+                <div class="text-white font-bold text-[14px] my-1">112 ms</div>
+                <span class="text-tertiary text-[10px] font-bold">● 100.0% UPTIME</span>
+              </div>
+              <div class="bg-[#060708] p-3 rounded border border-outline">
+                <div class="text-[10px] text-on-surface-variant uppercase">RISK ENGINE DMA</div>
+                <div class="text-white font-bold text-[14px] my-1">4 ms</div>
+                <span class="text-tertiary text-[10px] font-bold">● 100.0% UPTIME</span>
+              </div>
+            </div>
+
+            <!-- Live Diagnostic Terminal Stream -->
+            <div class="p-4 border-t border-outline">
+              <div class="text-[11px] font-mono text-on-surface-variant uppercase mb-2">LIVE DIAGNOSTIC LOG STREAM</div>
+              <div class="bg-[#060708] p-3 rounded border border-outline font-mono text-[11px] text-on-surface-variant space-y-1 h-36 overflow-y-auto">
+                <div>[12:46:00.102] <span class="text-tertiary">INFO</span> Direct Memory Access connection initialized on socket 0x4892.</div>
+                <div>[12:46:01.455] <span class="text-tertiary">INFO</span> Market data tick rate: 4,200 msg/sec. 0 dropped packets.</div>
+                <div>[12:46:03.882] <span class="text-primary">SYNC</span> Portfolio state verified against persistent transaction ledger.</div>
+                <div>[12:46:05.120] <span class="text-tertiary">INFO</span> Order book depth visualizer active. Low latency mode ON.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open Ticket Card -->
+          <div class="xl:col-span-4 flex flex-col terminal-panel p-4 font-mono text-[12px]">
+            <span class="text-white font-bold uppercase mb-2">CREATE SUPPORT DISPATCH TICKET</span>
+            <div class="space-y-3 flex-1">
+              <div>
+                <label class="text-[10px] text-on-surface-variant block mb-1">Issue Category</label>
+                <select class="w-full bg-[#060708] border border-outline rounded p-2 text-white text-[12px]">
+                  <option>Order Execution / DMA Latency</option>
+                  <option>Data Feed Discrepancy</option>
+                  <option>Portfolio Rebalancing Error</option>
+                  <option>Account & Arena Credentials</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] text-on-surface-variant block mb-1">Message Description</label>
+                <textarea rows="4" placeholder="Describe the diagnostic details..." class="w-full bg-[#060708] border border-outline rounded p-2 text-white text-[12px] resize-none"></textarea>
+              </div>
+              <button onclick="showToast('Support ticket dispatched to institutional desk.', 'success')" class="w-full py-2.5 bg-primary text-black font-bold rounded hover:bg-white transition-colors">
+                DISPATCH TICKET
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Master Status Bar -->
+  <footer class="h-[26px] bg-surface border-t border-outline flex items-center justify-between px-4 text-[10px] font-mono shrink-0 uppercase tracking-wider text-on-surface-variant z-20">
+    <div class="flex items-center gap-4">
+      <span class="text-primary font-bold">SYS: OPERATIONAL</span>
+      <span class="text-outline">|</span>
+      <span class="text-tertiary font-bold">FEED: DMA LIVE</span>
+      <span class="text-outline">|</span>
+      <span class="hidden sm:inline">TICK ENGINE: ACTIVE (1.6s)</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span>LAT: <strong class="text-primary">12ms</strong></span>
+      <span>CONN: <strong class="text-tertiary">TLS 1.3 256-BIT</strong></span>
+      <span class="hidden sm:inline" id="live-clock">12:46:12 GMT+5:30</span>
+    </div>
+  </footer>
+
+  <!-- Command Palette Modal (Ctrl+K) -->
+  <div id="command-palette-modal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-start justify-center pt-20 p-4">
+    <div class="w-full max-w-xl bg-surface border border-outline rounded-lg shadow-2xl overflow-hidden flex flex-col font-sans">
+      <div class="p-3 border-b border-outline flex items-center gap-3 bg-[#060708]">
+        <span class="material-symbols-outlined text-[20px] text-primary">terminal</span>
+        <input id="command-palette-input" oninput="filterCommandResults(this.value)" type="text" placeholder="Type a view, symbol, or command..." class="w-full bg-transparent text-white font-mono text-[13px] border-none outline-none focus:ring-0 p-0 placeholder-on-surface-variant"/>
+        <kbd onclick="closeCommandPalette()" class="cursor-pointer text-[10px] font-mono bg-[#15181e] border border-outline px-1.5 py-0.5 rounded text-on-surface-variant hover:text-white">ESC</kbd>
+      </div>
+      <div id="command-palette-results" class="max-h-80 overflow-y-auto p-2 flex flex-col gap-1 font-mono">
+        <!-- Filter results -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-10 right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-md w-full"></div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Update live clock in footer
+    setInterval(() => {
+      const clock = document.getElementById('live-clock');
+      if (clock) {
+        clock.textContent = new Date().toLocaleTimeString('en-US', { hour12: false }) + ' GMT+5:30';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

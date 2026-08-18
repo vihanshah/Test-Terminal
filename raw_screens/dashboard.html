@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Black Swan Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#ff8c00",
+                        "primary-container": "#cc7000",
+                        "on-primary": "#000000",
+                        "on-primary-container": "#ffffff",
+                        "tertiary": "#49ed72",
+                        "error": "#ffb4ab",
+                        "background": "#050505",
+                        "surface": "#0a0a0a",
+                        "surface-variant": "#0f0f0f",
+                        "on-background": "#e5e2e1",
+                        "on-surface": "#e5e2e1",
+                        "on-surface-variant": "#849396",
+                        "outline": "#2a2a2a",
+                        "outline-variant": "#1a1a1a"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter", "sans-serif"],
+                        "data-md": ["'IBM Plex Mono'", "monospace"],
+                        "data-lg": ["'IBM Plex Mono'", "monospace"],
+                        "label-caps": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .ticker-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        .ticker {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff8c00;
+        }
+        
+        .panel-header {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #849396;
+            background-color: #0f0f0f;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 0 12px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .allocation-bar {
+            display: flex;
+            height: 12px;
+            width: 100%;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-screen overflow-hidden flex selection:bg-primary selection:text-on-primary text-[14px]">
+<!-- Sidebar (Expanded) -->
+<nav class="w-[220px] bg-surface border-r border-outline flex flex-col py-4 z-10 shrink-0 gap-2 overflow-y-auto">
+<div class="px-4 mb-6 flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-primary text-on-primary font-bold text-[14px] rounded-sm shrink-0">
+            BS
+        </div>
+<div class="flex flex-col">
+<span class="font-bold text-primary tracking-wider uppercase text-[13px] leading-tight">Black Swan</span>
+<span class="text-on-surface-variant text-[11px]">Pro Terminal</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 px-2">
+<a class="h-10 px-3 flex items-center gap-3 text-primary bg-primary/10 border-l-2 border-primary hover:bg-primary/20 transition-colors rounded-r-md" href="#" title="Dashboard">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<div class="flex flex-col mt-2">
+<div class="px-3 py-2 text-[11px] font-bold tracking-wider text-on-surface-variant uppercase">Markets</div>
+<a class="h-8 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-4 text-[13px]" href="#">
+<span class="material-symbols-outlined text-[16px]">show_chart</span>
+<span>Equities</span>
+</a>
+<a class="h-8 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-4 text-[13px]" href="#">
+<span class="material-symbols-outlined text-[16px]">monetization_on</span>
+<span>Commodities</span>
+</a>
+<a class="h-8 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-4 text-[13px]" href="#">
+<span class="material-symbols-outlined text-[16px]">currency_bitcoin</span>
+<span>Crypto</span>
+</a>
+<a class="h-8 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-4 text-[13px]" href="#">
+<span class="material-symbols-outlined text-[16px]">real_estate_agent</span>
+<span>Real Estate</span>
+</a>
+</div>
+<div class="h-px bg-outline my-2 mx-2"></div>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Trade">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+<span class="font-medium">Trade</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Watchlist">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+<span class="font-medium">Watchlist</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Portfolio">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+<span class="font-medium">Portfolio</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Orders">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<span class="font-medium">Orders</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Transactions">
+<span class="material-symbols-outlined text-[20px]">list_alt</span>
+<span class="font-medium">Transactions</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="News">
+<span class="material-symbols-outlined text-[20px]">newspaper</span>
+<span class="font-medium">News</span>
+</a>
+<div class="h-px bg-outline my-2 mx-2"></div>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Leaderboard">
+<span class="material-symbols-outlined text-[20px]">leaderboard</span>
+<span class="font-medium">Leaderboard</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Event/Rules">
+<span class="material-symbols-outlined text-[20px]">gavel</span>
+<span class="font-medium">Event/Rules</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-1 px-2">
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Settings">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+<a class="h-10 px-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors rounded-md ml-[2px]" href="#" title="Support">
+<span class="material-symbols-outlined text-[20px]">contact_support</span>
+<span class="font-medium">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Wrapper -->
+<div class="flex-1 flex flex-col h-full min-w-0">
+<!-- Top Bar -->
+<header class="h-[56px] bg-surface border-b border-outline flex items-center justify-between px-4 font-data-md shrink-0">
+<div class="flex items-center gap-6 text-on-surface">
+<div class="flex items-center gap-3 text-[13px]">
+<span class="text-on-surface-variant">Day 04/10</span>
+<span class="text-outline">|</span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>Market Open</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 bg-background border border-outline rounded-md px-4 py-2">
+<span class="text-on-surface-variant text-[12px]">PORTFOLIO:</span>
+<span class="text-tertiary font-bold text-[14px]">₹10,84,250</span>
+<span class="text-tertiary bg-[#006727]/30 px-1.5 py-0.5 rounded text-[12px]">+1.2%</span>
+</div>
+<div class="flex items-center border border-outline bg-background px-3 py-2 w-80 rounded-md focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none text-on-surface focus:ring-0 p-0 text-[13px] w-full placeholder-outline outline-none" placeholder="Search Ticker / Command..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-primary transition-colors flex items-center justify-center p-1"><span class="material-symbols-outlined text-[20px]">refresh</span></button>
+<button class="hover:text-primary transition-colors flex items-center justify-center p-1"><span class="material-symbols-outlined text-[20px]">fullscreen</span></button>
+<button class="hover:text-primary transition-colors flex items-center justify-center p-1"><span class="material-symbols-outlined text-[20px]">account_circle</span></button>
+</div>
+</div>
+</header>
+<!-- Market Ticker -->
+<div class="h-[36px] bg-background border-b border-outline ticker-wrap flex items-center shrink-0">
+<div class="ticker text-[13px] font-data-md text-on-surface">
+<span class="mx-6"><span class="text-on-surface-variant">NIFTY 50</span> <span class="ml-2">22,514.65</span> <span class="text-tertiary ml-2">+0.45%</span></span>
+<span class="text-outline">|</span>
+<span class="mx-6"><span class="text-on-surface-variant">SENSEX</span> <span class="ml-2">74,221.05</span> <span class="text-tertiary ml-2">+0.38%</span></span>
+<span class="text-outline">|</span>
+<span class="mx-6"><span class="text-on-surface-variant">BANK NIFTY</span> <span class="ml-2">48,159.00</span> <span class="text-error ml-2">-0.12%</span></span>
+<span class="text-outline">|</span>
+<span class="mx-6"><span class="text-on-surface-variant">GOLD</span> <span class="ml-2">71,850.00</span> <span class="text-tertiary ml-2">+1.10%</span></span>
+<span class="text-outline">|</span>
+<span class="mx-6"><span class="text-on-surface-variant">BTC/USD</span> <span class="ml-2">64,231.00</span> <span class="text-tertiary ml-2">+1.20%</span></span>
+<span class="text-outline">|</span>
+<span class="mx-6"><span class="text-on-surface-variant">RELIANCE</span> <span class="ml-2">2,945.60</span> <span class="text-error ml-2">-0.42%</span></span>
+<span class="text-outline">|</span>
+<span class="mx-6"><span class="text-on-surface-variant">TCS</span> <span class="ml-2">4,012.25</span> <span class="text-tertiary ml-2">+1.15%</span></span>
+</div>
+</div>
+<!-- Main Grid Area (2 Columns) -->
+<div class="flex-1 overflow-hidden p-2 flex gap-2 bg-background">
+<!-- Center Column (Main Content) -->
+<div class="flex-[7] flex flex-col gap-2 min-w-0">
+<!-- Portfolio Summary -->
+<div class="border border-outline bg-surface p-4 flex flex-col gap-4 shrink-0 rounded-sm">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-[12px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">Total Portfolio Value</h2>
+<div class="text-[32px] font-bold text-on-surface font-data-lg leading-none">₹10,84,250.00</div>
+</div>
+<div class="flex items-center border border-primary bg-primary/10 px-3 py-1.5 text-primary font-bold rounded-sm text-[13px]">
+                        RANK #07/50
+                    </div>
+</div>
+<div class="flex items-center gap-8 font-data-md text-[13px]">
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Today's P&amp;L</span>
+<span class="text-tertiary font-medium">+₹18,420.00 (+1.72%)</span>
+</div>
+<div class="w-px h-8 bg-outline"></div>
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Total Return</span>
+<span class="text-tertiary font-medium">+₹84,250.00 (+8.42%)</span>
+</div>
+<div class="w-px h-8 bg-outline"></div>
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Invested</span>
+<span class="text-on-surface">₹8,50,000.00</span>
+</div>
+<div class="w-px h-8 bg-outline"></div>
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Available Cash</span>
+<span class="text-on-surface">₹2,34,250.00</span>
+</div>
+</div>
+<!-- Asset Allocation -->
+<div class="mt-2 pt-4 border-t border-outline flex flex-col gap-3">
+<div class="text-[11px] text-on-surface-variant uppercase tracking-wider font-bold">Asset Allocation</div>
+<div class="allocation-bar">
+<div class="bg-[#3b82f6]" style="width: 34%;" title="Equities: 34%"></div>
+<div class="bg-[#eab308]" style="width: 12%;" title="Gold: 12%"></div>
+<div class="bg-[#8b5cf6]" style="width: 10%;" title="Mutual Funds: 10%"></div>
+<div class="bg-[#ec4899]" style="width: 8%;" title="Real Estate: 8%"></div>
+<div class="bg-[#06b6d4]" style="width: 8%;" title="ETFs: 8%"></div>
+<div class="bg-[#f97316]" style="width: 7%;" title="Crypto: 7%"></div>
+<div class="bg-[#10b981]" style="width: 6%;" title="Liquid Funds: 6%"></div>
+<div class="bg-[#64748b]" style="width: 5%;" title="Fixed Deposits: 5%"></div>
+<div class="bg-[#94a3b8]" style="width: 5%;" title="Silver: 5%"></div>
+<div class="bg-primary" style="width: 5%;" title="Cash: 5%"></div>
+</div>
+<div class="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-data-md">
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-[#3b82f6]"></div><span class="text-on-surface-variant">Equities (34%)</span></div>
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-[#eab308]"></div><span class="text-on-surface-variant">Gold (12%)</span></div>
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-[#8b5cf6]"></div><span class="text-on-surface-variant">Mutual Funds (10%)</span></div>
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-[#ec4899]"></div><span class="text-on-surface-variant">Real Estate (8%)</span></div>
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-[#06b6d4]"></div><span class="text-on-surface-variant">ETFs (8%)</span></div>
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-[#f97316]"></div><span class="text-on-surface-variant">Crypto (7%)</span></div>
+<div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-sm bg-primary]"></div><span class="text-on-surface-variant">Cash (5%)</span></div>
+<div class="text-on-surface-variant hover:text-on-surface cursor-pointer underline">+3 More</div>
+</div>
+</div>
+</div>
+<!-- Main Chart -->
+<div class="flex-[3] border border-outline bg-surface flex flex-col relative overflow-hidden min-h-[300px] rounded-sm">
+<div class="panel-header">
+<div class="flex items-center gap-4">
+<span class="text-on-surface font-bold text-[14px]">PORTFOLIO PERFORMANCE</span>
+<span class="font-data-md text-[14px]">10,84,250.00</span>
+<span class="font-data-md text-tertiary text-[13px]">+18,420 (+1.72%)</span>
+</div>
+<div class="flex gap-2 font-data-md text-[12px]">
+<button class="px-2 py-1 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant rounded">Today</button>
+<button class="px-2 py-1 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant rounded">Simulation</button>
+</div>
+</div>
+<div class="flex-1 relative bg-background overflow-hidden border-t border-outline">
+<!-- Grid Lines -->
+<div class="absolute inset-0 opacity-[0.05]" style="background-image: linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 60px 60px;"></div>
+<!-- Y Axis -->
+<div class="absolute right-0 top-0 bottom-16 w-16 border-l border-outline bg-surface/50 flex flex-col justify-between py-4 pr-2 items-end font-data-md text-[11px] text-on-surface-variant">
+<span>1100K</span>
+<span>1050K</span>
+<span>1000K</span>
+<span>950K</span>
+</div>
+<!-- X Axis -->
+<div class="absolute bottom-0 left-0 right-16 h-8 border-t border-outline bg-surface/50 flex justify-between px-8 items-center font-data-md text-[11px] text-on-surface-variant">
+<span>Oct 01</span>
+<span>Oct 04</span>
+<span>Oct 07</span>
+<span>Oct 10</span>
+</div>
+<!-- Mock Performance Line -->
+<svg class="absolute inset-0 w-[calc(100%-64px)] h-[calc(100%-32px)]" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0,80 Q10,75 20,60 T40,50 T60,30 T80,40 T100,10" fill="none" stroke="#49ed72" stroke-width="2"></path>
+<path d="M0,80 Q10,75 20,60 T40,50 T60,30 T80,40 T100,10 L100,100 L0,100 Z" fill="url(#gradient)" opacity="0.1"></path>
+<defs>
+<lineargradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#49ed72"></stop>
+<stop offset="100%" stop-color="transparent"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+</div>
+<!-- Holdings -->
+<div class="flex-[2] border border-outline bg-surface flex flex-col min-h-[250px] rounded-sm">
+<div class="panel-header">
+<span>CURRENT HOLDINGS</span>
+<div class="flex gap-3 items-center text-[11px]">
+<a class="text-primary hover:underline font-bold mr-2" href="#">View Full Portfolio</a>
+<button class="hover:text-primary transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-[18px]">filter_list</span></button>
+<button class="hover:text-primary transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-[18px]">download</span></button>
+</div>
+</div>
+<div class="flex-1 overflow-auto bg-background">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead class="sticky top-0 bg-surface-variant font-body-md text-[11px] uppercase text-on-surface-variant border-b border-outline">
+<tr>
+<th class="py-2.5 px-4 font-semibold tracking-wider">ASSET</th>
+<th class="py-2.5 px-4 font-semibold tracking-wider">TYPE</th>
+<th class="py-2.5 px-4 font-semibold text-right tracking-wider">QTY</th>
+<th class="py-2.5 px-4 font-semibold text-right tracking-wider">AVG BUY</th>
+<th class="py-2.5 px-4 font-semibold text-right tracking-wider">CURRENT</th>
+<th class="py-2.5 px-4 font-semibold text-right tracking-wider">P&amp;L (₹)</th>
+<th class="py-2.5 px-4 font-semibold text-right tracking-wider">P&amp;L (%)</th>
+</tr>
+</thead>
+<tbody class="font-data-md text-[13px]">
+<tr class="border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<td class="px-4 py-3 font-bold text-on-surface">RELIANCE</td>
+<td class="px-4 py-3 text-on-surface-variant text-[11px]">Equity</td>
+<td class="px-4 py-3 text-right">150</td>
+<td class="px-4 py-3 text-right text-on-surface-variant">2,850.00</td>
+<td class="px-4 py-3 text-right">2,945.60</td>
+<td class="px-4 py-3 text-right text-tertiary">+14,340.00</td>
+<td class="px-4 py-3 text-right text-tertiary">+3.35%</td>
+</tr>
+<tr class="border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<td class="px-4 py-3 font-bold text-on-surface">24K GOLD</td>
+<td class="px-4 py-3 text-on-surface-variant text-[11px]">Gold</td>
+<td class="px-4 py-3 text-right">10g</td>
+<td class="px-4 py-3 text-right text-on-surface-variant">69,500.00</td>
+<td class="px-4 py-3 text-right">71,850.00</td>
+<td class="px-4 py-3 text-right text-tertiary">+2,350.00</td>
+<td class="px-4 py-3 text-right text-tertiary">+3.38%</td>
+</tr>
+<tr class="border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<td class="px-4 py-3 font-bold text-on-surface">BTC</td>
+<td class="px-4 py-3 text-on-surface-variant text-[11px]">Crypto</td>
+<td class="px-4 py-3 text-right">0.15</td>
+<td class="px-4 py-3 text-right text-on-surface-variant">61,000.00</td>
+<td class="px-4 py-3 text-right">64,231.00</td>
+<td class="px-4 py-3 text-right text-tertiary">+484.65</td>
+<td class="px-4 py-3 text-right text-tertiary">+5.29%</td>
+</tr>
+<tr class="border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<td class="px-4 py-3 font-bold text-on-surface">MUMBAI METRO</td>
+<td class="px-4 py-3 text-on-surface-variant text-[11px]">Real Estate</td>
+<td class="px-4 py-3 text-right">1 Unit</td>
+<td class="px-4 py-3 text-right text-on-surface-variant">1,50,000</td>
+<td class="px-4 py-3 text-right">1,48,000</td>
+<td class="px-4 py-3 text-right text-error">-2,000.00</td>
+<td class="px-4 py-3 text-right text-error">-1.33%</td>
+</tr>
+<tr class="border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<td class="px-4 py-3 font-bold text-on-surface">HDFC BALANCED</td>
+<td class="px-4 py-3 text-on-surface-variant text-[11px]">Mutual Fund</td>
+<td class="px-4 py-3 text-right">500</td>
+<td class="px-4 py-3 text-right text-on-surface-variant">210.00</td>
+<td class="px-4 py-3 text-right">225.50</td>
+<td class="px-4 py-3 text-right text-tertiary">+7,750.00</td>
+<td class="px-4 py-3 text-right text-tertiary">+7.38%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column (Tools & Info) -->
+<div class="flex-[3] flex flex-col gap-2 min-w-[320px] max-w-[400px]">
+<!-- Market Overview -->
+<div class="flex-[3] border border-outline bg-surface flex flex-col min-h-[250px] rounded-sm">
+<div class="panel-header">
+<span>MARKET OVERVIEW</span>
+<button class="hover:text-primary transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-[18px]">add</span></button>
+</div>
+<div class="flex-1 overflow-auto bg-background font-data-md text-[13px]">
+<!-- Header Row -->
+<div class="flex justify-between px-4 py-2 border-b border-outline text-[11px] text-on-surface-variant uppercase font-body-md sticky top-0 bg-surface-variant z-10 font-semibold tracking-wider">
+<span>Asset Class</span>
+<span>Performance</span>
+</div>
+<!-- Rows -->
+<div class="flex justify-between items-center py-2.5 px-4 border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<div>
+<div class="font-bold text-on-surface">Equities</div>
+</div>
+<div class="w-12 h-3 opacity-60 bg-gradient-to-r from-transparent to-tertiary"></div>
+<div class="text-right">
+<div class="text-tertiary text-[13px]">+1.42%</div>
+</div>
+</div>
+<div class="flex justify-between items-center py-2.5 px-4 border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<div>
+<div class="font-bold text-on-surface">Gold</div>
+</div>
+<div class="w-12 h-3 opacity-60 bg-gradient-to-r from-transparent to-tertiary"></div>
+<div class="text-right">
+<div class="text-tertiary text-[13px]">+0.64%</div>
+</div>
+</div>
+<div class="flex justify-between items-center py-2.5 px-4 border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<div>
+<div class="font-bold text-on-surface">Real Estate</div>
+</div>
+<div class="w-12 h-3 opacity-60 bg-gradient-to-r from-transparent to-error"></div>
+<div class="text-right">
+<div class="text-error text-[13px]">-0.25%</div>
+</div>
+</div>
+<div class="flex justify-between items-center py-2.5 px-4 border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<div>
+<div class="font-bold text-on-surface">Crypto</div>
+</div>
+<div class="w-12 h-3 opacity-60 bg-gradient-to-r from-transparent to-tertiary"></div>
+<div class="text-right">
+<div class="text-tertiary text-[13px]">+2.85%</div>
+</div>
+</div>
+<div class="flex justify-between items-center py-2.5 px-4 border-b border-outline hover:bg-outline-variant cursor-pointer transition-colors">
+<div>
+<div class="font-bold text-on-surface">Bonds</div>
+</div>
+<div class="w-12 h-3 opacity-60 bg-gradient-to-r from-transparent to-tertiary"></div>
+<div class="text-right">
+<div class="text-tertiary text-[13px]">+0.10%</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Terminal Wire -->
+<div class="flex-[3] border border-outline bg-surface flex flex-col min-h-[250px] rounded-sm">
+<div class="panel-header">
+<span>TERMINAL WIRE</span>
+<span class="text-[11px] text-tertiary flex items-center gap-1.5 font-data-md font-bold">
+<span class="w-2 h-2 bg-tertiary rounded-full animate-pulse"></span> LIVE
+                        </span>
+</div>
+<div class="flex-1 overflow-auto bg-background p-4">
+<div class="flex flex-col gap-4 font-body-md text-[13px]">
+<div class="pb-3 border-b border-outline">
+<div class="flex items-center gap-3 text-[11px] font-data-md mb-1.5">
+<span class="text-primary font-bold">12:45:02</span>
+<span class="bg-outline-variant px-1.5 py-0.5 rounded text-on-surface-variant">RELIANCE</span>
+</div>
+<div class="text-on-surface hover:text-primary cursor-pointer transition-colors leading-relaxed">
+                                    Reliance Industries announces new ₹50,000 Cr investment in green energy sector over next 3 years.
+                                </div>
+</div>
+<div class="pb-3 border-b border-outline">
+<div class="flex items-center gap-3 text-[11px] font-data-md mb-1.5">
+<span class="text-on-surface-variant">12:30:15</span>
+<span class="bg-outline-variant px-1.5 py-0.5 rounded text-on-surface-variant">MACRO</span>
+</div>
+<div class="text-on-surface hover:text-primary cursor-pointer transition-colors leading-relaxed">
+                                    RBI maintains repo rate at 6.5%, signals continued focus on inflation control.
+                                </div>
+</div>
+<div class="pb-3 border-b border-outline">
+<div class="flex items-center gap-3 text-[11px] font-data-md mb-1.5">
+<span class="text-error font-bold">12:15:44</span>
+<span class="bg-outline-variant px-1.5 py-0.5 rounded text-on-surface-variant">REAL ESTATE</span>
+</div>
+<div class="text-on-surface hover:text-primary cursor-pointer transition-colors leading-relaxed">
+                                    Mumbai commercial real estate registrations dip 12% MoM amid rising interest rates.
+                                </div>
+</div>
+<div class="pb-3 border-b border-outline">
+<div class="flex items-center gap-3 text-[11px] font-data-md mb-1.5">
+<span class="text-on-surface-variant">11:55:00</span>
+<span class="bg-outline-variant px-1.5 py-0.5 rounded text-on-surface-variant">CRYPTO</span>
+</div>
+<div class="text-on-surface hover:text-primary cursor-pointer transition-colors leading-relaxed">
+                                    Bitcoin crosses $64,000 mark as institutional inflows reach new high for the quarter.
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Status Bar -->
+<footer class="h-[28px] bg-surface border-t border-outline flex items-center justify-between px-4 text-[11px] font-data-md shrink-0 uppercase tracking-wider text-on-surface-variant">
+<div class="flex items-center gap-6">
+<span class="text-primary font-bold">SYS: OPERATIONAL</span>
+<span class="text-outline">|</span>
+<span class="text-tertiary font-bold">DATA: LIVE</span>
+<span class="text-outline">|</span>
+<span>FEEDS: 24 8s ago</span>
+</div>
+<div class="flex items-center gap-6">
+<span>LAT: <span class="text-primary font-bold">12ms</span></span>
+<span>CONN: <span class="text-tertiary font-bold">SECURE</span></span>
+<span>MEM: 32MB</span>
+<span>12:46:12 GMT+5:30</span>
+</div>
+</footer>
+</div>
+</body></html>
