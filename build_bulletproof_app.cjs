@@ -7,7 +7,7 @@ const audioJs = fs.readFileSync(path.join(__dirname, 'js', 'audio.js'), 'utf8');
 const chartsJs = fs.readFileSync(path.join(__dirname, 'js', 'charts.js'), 'utf8');
 const appJs = fs.readFileSync(path.join(__dirname, 'js', 'app.js'), 'utf8');
 
-console.log('Building bulletproof index.html...');
+console.log('Generating perfected Obsidian/Cyan Black Swan Terminal index.html...');
 
 const html = `<!DOCTYPE html>
 <html class="dark" lang="en">
@@ -86,8 +86,8 @@ ${cssContent}
       <span id="black-swan-alert-text" class="text-[12px] font-mono text-white"></span>
     </div>
     <div class="flex items-center gap-2">
-      <button onclick="navigateTo('simulation')" class="px-2.5 py-1 bg-[#ff3d57]/30 hover:bg-[#ff3d57]/50 text-white rounded text-[11px] font-mono font-bold border border-[#ff3d57]">VIEW SIMULATOR</button>
-      <button onclick="triggerBlackSwanShock('reset')" class="px-2.5 py-1 bg-[#21262d] hover:bg-[#30363d] text-on-surface-variant rounded text-[11px] font-mono">DISMISS</button>
+      <button onclick="navigateTo('simulation')" class="px-2.5 py-1 bg-[#ff3d57]/30 hover:bg-[#ff3d57]/50 text-white rounded text-[11px] font-mono font-bold border border-[#ff3d57] cursor-pointer">VIEW SIMULATOR</button>
+      <button onclick="triggerBlackSwanShock('reset')" class="px-2.5 py-1 bg-[#21262d] hover:bg-[#30363d] text-on-surface-variant rounded text-[11px] font-mono cursor-pointer">DISMISS</button>
     </div>
   </div>
 
@@ -95,7 +95,7 @@ ${cssContent}
   <header class="h-[50px] bg-surface border-b border-outline flex items-center justify-between px-4 font-mono shrink-0 z-30">
     <div class="flex items-center gap-4">
       <!-- Logo / System Tag -->
-      <a href="#dashboard" data-view="dashboard" class="flex items-center gap-2.5 group cursor-pointer">
+      <a href="#dashboard" data-view="dashboard" onclick="navigateTo('dashboard', true, event)" class="flex items-center gap-2.5 group cursor-pointer">
         <div class="w-8 h-8 flex items-center justify-center bg-primary text-black font-extrabold text-[13px] rounded-sm tracking-tighter">
           BS
         </div>
@@ -145,14 +145,14 @@ ${cssContent}
       <button id="header-fullscreen-toggle" title="Fullscreen Toggle" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors cursor-pointer">
         <span class="material-symbols-outlined text-[18px]">fullscreen</span>
       </button>
-      <button data-view="settings" title="Terminal Settings" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors cursor-pointer">
+      <button data-view="settings" onclick="navigateTo('settings', true, event)" title="Terminal Settings" class="p-1.5 hover:text-primary hover:bg-[#15181e] rounded transition-colors cursor-pointer">
         <span class="material-symbols-outlined text-[18px]">settings</span>
       </button>
       
       <div class="h-5 w-px bg-outline mx-1"></div>
 
       <!-- User Profile Badge -->
-      <div data-view="settings" class="flex items-center gap-2 px-2 py-1 bg-[#15181e] hover:bg-[#1b2028] border border-outline rounded cursor-pointer transition-colors">
+      <div data-view="settings" onclick="navigateTo('settings', true, event)" class="flex items-center gap-2 px-2 py-1 bg-[#15181e] hover:bg-[#1b2028] border border-outline rounded cursor-pointer transition-colors">
         <div class="w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary flex items-center justify-center text-[11px] font-bold">
           BS
         </div>
@@ -204,44 +204,44 @@ ${cssContent}
       
       <!-- Primary Core Nav -->
       <div class="flex flex-col gap-0.5 px-2">
-        <button data-view="dashboard" class="nav-item active h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="dashboard" onclick="navigateTo('dashboard', true, event)" class="nav-item active h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">dashboard</span>
           <span class="font-medium">Dashboard</span>
         </button>
 
-        <button data-view="markets" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="markets" onclick="navigateTo('markets', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">show_chart</span>
           <span class="font-medium">Markets</span>
         </button>
 
-        <button data-view="trade" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="trade" onclick="navigateTo('trade', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">swap_horiz</span>
           <span class="font-medium">Trade Terminal</span>
           <span class="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></span>
         </button>
 
-        <button data-view="watchlist" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="watchlist" onclick="navigateTo('watchlist', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">visibility</span>
           <span class="font-medium">Watchlist</span>
         </button>
 
-        <button data-view="portfolio" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="portfolio" onclick="navigateTo('portfolio', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
           <span class="font-medium">Portfolio</span>
         </button>
 
-        <button data-view="orders" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="orders" onclick="navigateTo('orders', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">receipt_long</span>
           <span class="font-medium">Orders</span>
           <span class="ml-auto bg-[#21262d] text-primary text-[10px] font-mono px-1.5 py-0.2 rounded">3</span>
         </button>
 
-        <button data-view="transactions" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="transactions" onclick="navigateTo('transactions', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">list_alt</span>
           <span class="font-medium">Transactions</span>
         </button>
 
-        <button data-view="news" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="news" onclick="navigateTo('news', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">newspaper</span>
           <span class="font-medium">News & Wire</span>
           <span class="ml-auto text-tertiary text-[10px] font-mono font-bold">LIVE</span>
@@ -250,13 +250,13 @@ ${cssContent}
         <div class="h-px bg-outline my-2 mx-1"></div>
         <div class="px-3 py-1 text-[10px] font-bold tracking-wider text-on-surface-variant uppercase font-mono">ARENA & RULES</div>
 
-        <button data-view="leaderboard" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="leaderboard" onclick="navigateTo('leaderboard', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">leaderboard</span>
           <span class="font-medium">Leaderboard</span>
           <span class="ml-auto text-secondary text-[10px] font-mono font-bold">#7</span>
         </button>
 
-        <button data-view="simulation" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="simulation" onclick="navigateTo('simulation', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">gavel</span>
           <span class="font-medium">Event & Rules</span>
           <span class="ml-auto bg-[#ff3d57]/20 text-[#ff3d57] text-[10px] font-mono px-1 rounded font-bold">SHOCK</span>
@@ -265,12 +265,12 @@ ${cssContent}
 
       <!-- Bottom Nav (Settings & Support) -->
       <div class="mt-auto flex flex-col gap-0.5 px-2 pt-3 border-t border-outline">
-        <button data-view="settings" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="settings" onclick="navigateTo('settings', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">settings</span>
           <span class="font-medium">Settings</span>
         </button>
 
-        <button data-view="support" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
+        <button data-view="support" onclick="navigateTo('support', true, event)" class="nav-item h-9 px-3 flex items-center gap-3 text-on-surface-variant hover:text-white hover:bg-[#15181e] transition-colors rounded text-[13px] w-full text-left cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">contact_support</span>
           <span class="font-medium">Support & Logs</span>
         </button>
@@ -320,7 +320,7 @@ ${cssContent}
             <div class="text-[24px] font-bold text-white font-mono my-2 leading-none">₹2,34,250.00</div>
             <div class="flex items-center gap-2 text-[12px] font-mono">
               <span class="text-on-surface-variant">21.6% of Portfolio</span>
-              <button data-view="trade" class="text-primary hover:underline ml-auto font-bold cursor-pointer">Trade Now →</button>
+              <button data-view="trade" onclick="navigateTo('trade')" class="text-primary hover:underline ml-auto font-bold cursor-pointer">Trade Now →</button>
             </div>
           </div>
 
@@ -364,7 +364,7 @@ ${cssContent}
             <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#06b6d4]"></div><span class="text-on-surface-variant">ETFs (8%)</span></div>
             <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-[#f97316]"></div><span class="text-on-surface-variant">Crypto (7%)</span></div>
             <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-sm bg-primary"></div><span class="text-on-surface-variant">Cash (5%)</span></div>
-            <button data-view="portfolio" class="text-primary hover:underline font-bold cursor-pointer">+3 More Assets</button>
+            <button data-view="portfolio" onclick="navigateTo('portfolio')" class="text-primary hover:underline font-bold cursor-pointer">+3 More Assets</button>
           </div>
         </div>
 
@@ -420,7 +420,7 @@ ${cssContent}
               <div class="panel-header">
                 <span>ACTIVE HOLDINGS LEDGER</span>
                 <div class="flex items-center gap-3 font-mono text-[11px]">
-                  <button data-view="portfolio" class="text-primary hover:underline font-bold cursor-pointer">Full Analytics →</button>
+                  <button data-view="portfolio" onclick="navigateTo('portfolio')" class="text-primary hover:underline font-bold cursor-pointer">Full Analytics →</button>
                 </div>
               </div>
               <div class="overflow-x-auto">
@@ -605,7 +605,7 @@ ${cssContent}
 
               </div>
               <div class="p-2 border-t border-outline bg-[#060708] text-center">
-                <button data-view="news" class="text-[11px] font-mono text-primary hover:underline font-bold cursor-pointer">Open Institutional Wire Full View →</button>
+                <button data-view="news" onclick="navigateTo('news')" class="text-[11px] font-mono text-primary hover:underline font-bold cursor-pointer">Open Institutional Wire Full View →</button>
               </div>
             </div>
 
@@ -1101,7 +1101,7 @@ ${cssContent}
         <div class="terminal-panel flex flex-col flex-1">
           <div class="panel-header">
             <span>DETAILED PORTFOLIO HOLDINGS & RISK PROFILE</span>
-            <button data-view="trade" class="text-primary font-mono text-[11px] font-bold hover:underline cursor-pointer">Rebalance Portfolio →</button>
+            <button data-view="trade" onclick="navigateTo('trade')" class="text-primary font-mono text-[11px] font-bold hover:underline cursor-pointer">Rebalance Portfolio →</button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left font-mono text-[12px] whitespace-nowrap">
@@ -1172,7 +1172,7 @@ ${cssContent}
               <span class="text-white font-bold text-[13px]">LIVE ORDER MANAGEMENT QUEUE</span>
             </div>
             <div class="flex gap-1 font-mono text-[11px]">
-              <button class="px-2.5 py-1 bg-primary text-black font-bold rounded">OPEN ORDERS</button>
+              <button class="px-2.5 py-1 bg-primary text-black font-bold rounded cursor-pointer">OPEN ORDERS</button>
               <button class="px-2.5 py-1 bg-[#15181e] text-on-surface-variant hover:text-white rounded cursor-pointer">FILLED</button>
               <button class="px-2.5 py-1 bg-[#15181e] text-on-surface-variant hover:text-white rounded cursor-pointer">CANCELLED</button>
             </div>
@@ -1258,7 +1258,7 @@ ${cssContent}
                 <span class="status-beacon bg-tertiary ml-2"></span>
               </div>
               <div class="flex gap-1 font-mono text-[11px]">
-                <button class="px-2.5 py-0.5 bg-primary text-black font-bold rounded">ALL</button>
+                <button class="px-2.5 py-0.5 bg-primary text-black font-bold rounded cursor-pointer">ALL</button>
                 <button class="px-2.5 py-0.5 bg-[#15181e] text-on-surface-variant hover:text-white rounded cursor-pointer">MACRO</button>
                 <button class="px-2.5 py-0.5 bg-[#15181e] text-on-surface-variant hover:text-white rounded cursor-pointer">EQUITIES</button>
                 <button class="px-2.5 py-0.5 bg-[#15181e] text-on-surface-variant hover:text-white rounded cursor-pointer">CRYPTO</button>
@@ -1409,7 +1409,7 @@ ${cssContent}
                   <td class="py-3 px-4 text-center">🥈</td>
                 </tr>
                 <tr class="hover:bg-[#15181e]">
-                  <td class="py-3 px-4 text-white font-bold">#03</td>
+                  <td class="py-3 px-4 font-bold text-white">#03</td>
                   <td class="py-3 px-4 font-bold text-white">SWAN_TACTICIAN</td>
                   <td class="py-3 px-4"><span class="px-2 py-0.5 bg-primary/20 text-primary rounded text-[10px] font-bold">Master</span></td>
                   <td class="py-3 px-4 text-right text-tertiary font-bold">+19.80%</td>
@@ -1704,7 +1704,7 @@ ${cssContent}
   <!-- Toast Container -->
   <div id="toast-container" class="fixed bottom-10 right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-md w-full"></div>
 
-  <!-- Inlined Core Scripts for Zero Cache Latency -->
+  <!-- Core Scripts -->
   <script>
 ${audioJs}
   </script>
@@ -1716,8 +1716,65 @@ ${chartsJs}
   <script>
 ${appJs}
 
+    // Direct, Unstoppable Navigation Function
+    window.navigateTo = function(viewId, triggerSound = true, ev = null) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      if (!viewId) viewId = 'dashboard';
+      viewId = viewId.replace(/^#/, '');
+
+      if (triggerSound && window.terminalAudio) {
+        try { window.terminalAudio.playClick(); } catch (e) {}
+      }
+
+      if (window.APP_STATE) window.APP_STATE.activeView = viewId;
+
+      try {
+        if (window.location.hash !== '#' + viewId) {
+          history.replaceState(null, null, '#' + viewId);
+        }
+      } catch (e) {}
+
+      // 1. Highlight sidebar buttons
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        if (btn.getAttribute('data-view') === viewId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // 2. Isolate View: Hide all, Show target
+      const allViews = document.querySelectorAll('.spa-view');
+      allViews.forEach(view => {
+        if (view.id === 'view-' + viewId) {
+          view.classList.add('active-view');
+          view.style.setProperty('display', 'flex', 'important');
+        } else {
+          view.classList.remove('active-view');
+          view.style.setProperty('display', 'none', 'important');
+        }
+      });
+
+      // 3. Trade chart resize
+      if (viewId === 'trade') {
+        setTimeout(() => {
+          try {
+            if (!window.APP_STATE.candlestickChartInstance) {
+              window.APP_STATE.candlestickChartInstance = new CandlestickChart('trade-candlestick-canvas');
+            } else {
+              window.APP_STATE.candlestickChartInstance.resize();
+              window.APP_STATE.candlestickChartInstance.render();
+            }
+          } catch (e) {}
+        }, 50);
+      }
+
+      const viewport = document.getElementById('app-viewport');
+      if (viewport) viewport.scrollTop = 0;
+    };
+
     // Markets Table Category Filtering
-    function filterMarketsTable(category, btn) {
+    window.filterMarketsTable = function(category, btn) {
       if (btn) {
         document.querySelectorAll('.market-filter-btn').forEach(b => {
           b.className = 'market-filter-btn px-2.5 py-1 text-on-surface-variant hover:text-white bg-[#15181e] rounded cursor-pointer';
@@ -1733,18 +1790,34 @@ ${appJs}
           row.style.display = 'none';
         }
       });
-    }
+    };
 
-    // Global Click Delegation for All Navigation Items
+    // Global Click Delegation for any element with [data-view]
     document.addEventListener('click', (e) => {
       const navTarget = e.target.closest('[data-view]');
       if (navTarget) {
         e.preventDefault();
         const targetView = navTarget.getAttribute('data-view');
         if (targetView) {
-          navigateTo(targetView);
+          window.navigateTo(targetView);
         }
       }
+    });
+
+    // Boot Navigation on Load
+    function boot() {
+      const hash = (window.location.hash || '').replace(/^#/, '') || 'dashboard';
+      window.navigateTo(hash, false);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = (window.location.hash || '').replace(/^#/, '') || 'dashboard';
+      window.navigateTo(hash, false);
     });
 
     // Update live clock in footer
@@ -1760,4 +1833,4 @@ ${appJs}
 `;
 
 fs.writeFileSync(path.join(__dirname, 'index.html'), html, 'utf8');
-console.log('Successfully generated self-contained, bulletproof index.html!');
+console.log('Successfully generated index.html!');
